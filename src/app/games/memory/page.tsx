@@ -1,101 +1,137 @@
-"use client"
+'use client';
 
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
-const emojis = ['🎮', '🎨', '🎭', '🎪', '🎯', '🎲', '🎸', '🎺']
+const EMOJIS = ['🎓', '📚', '🎨', '🎵', '⚽', '🌟', '🎮', '🎪'];
+
+interface Card {
+  id: number;
+  emoji: string;
+  isFlipped: boolean;
+  isMatched: boolean;
+}
 
 export default function MemoryGame() {
-  const [cards, setCards] = useState<{ id: number; emoji: string; flipped: boolean; matched: boolean }[]>([])
-  const [flipped, setFlipped] = useState<number[]>([])
-  const [moves, setMoves] = useState(0)
-  const [matches, setMatches] = useState(0)
+  const router = useRouter();
+  const [cards, setCards] = useState<Card[]>([]);
+  const [flippedCards, setFlippedCards] = useState<number[]>([]);
+  const [moves, setMoves] = useState(0);
+  const [matches, setMatches] = useState(0);
+  const [gameWon, setGameWon] = useState(false);
 
-  useEffect(() => { initGame() }, [])
+  useEffect(() => {
+    initializeGame();
+  }, []);
 
-  const initGame = () => {
-    const pairs = [...emojis, ...emojis]
+  const initializeGame = () => {
+    const shuffled = [...EMOJIS, ...EMOJIS]
       .sort(() => Math.random() - 0.5)
-      .map((emoji, i) => ({ id: i, emoji, flipped: false, matched: false }))
-    setCards(pairs)
-    setFlipped([])
-    setMoves(0)
-    setMatches(0)
-  }
+      .map((emoji, index) => ({
+        id: index,
+        emoji,
+        isFlipped: false,
+        isMatched: false
+      }));
+    setCards(shuffled);
+    setFlippedCards([]);
+    setMoves(0);
+    setMatches(0);
+    setGameWon(false);
+  };
 
-  const handleClick = (id: number) => {
-    if (flipped.length === 2) return
-    const card = cards[id]
-    if (card.flipped || card.matched) return
+  const handleCardClick = (id: number) => {
+    if (flippedCards.length === 2) return;
+    if (cards[id].isFlipped || cards[id].isMatched) return;
 
-    const newCards = [...cards]
-    newCards[id].flipped = true
-    setCards(newCards)
+    const newCards = [...cards];
+    newCards[id].isFlipped = true;
+    setCards(newCards);
 
-    const newFlipped = [...flipped, id]
-    setFlipped(newFlipped)
+    const newFlipped = [...flippedCards, id];
+    setFlippedCards(newFlipped);
 
     if (newFlipped.length === 2) {
-      setMoves(m => m + 1)
-      const [first, second] = newFlipped
+      setMoves(m => m + 1);
+      const [first, second] = newFlipped;
+
       if (cards[first].emoji === cards[second].emoji) {
         setTimeout(() => {
-          const matched = [...cards]
-          matched[first].matched = true
-          matched[second].matched = true
-          setCards(matched)
-          setFlipped([])
-          setMatches(m => m + 1)
-        }, 500)
+          const matchedCards = [...cards];
+          matchedCards[first].isMatched = true;
+          matchedCards[second].isMatched = true;
+          setCards(matchedCards);
+          setFlippedCards([]);
+          
+          const newMatches = matches + 1;
+          setMatches(newMatches);
+          
+          if (newMatches === EMOJIS.length) {
+            setGameWon(true);
+          }
+        }, 500);
       } else {
         setTimeout(() => {
-          const reset = [...cards]
-          reset[first].flipped = false
-          reset[second].flipped = false
-          setCards(reset)
-          setFlipped([])
-        }, 1000)
+          const resetCards = [...cards];
+          resetCards[first].isFlipped = false;
+          resetCards[second].isFlipped = false;
+          setCards(resetCards);
+          setFlippedCards([]);
+        }, 1000);
       }
     }
-  }
-
-  const won = matches === emojis.length
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 to-pink-100 p-4 flex items-center justify-center">
-      <div className="bg-white rounded-3xl p-6 shadow-2xl max-w-md w-full text-center">
-        <h1 className="text-3xl font-bold mb-2">🧠 لعبة الذاكرة</h1>
-        <p className="text-gray-600 mb-4">المحاولات: {moves} | التطابقات: {matches}/{emojis.length}</p>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-6" dir="rtl">
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-white rounded-3xl shadow-2xl p-8">
+          <h1 className="text-4xl font-bold text-center mb-6">🧠 لعبة الذاكرة</h1>
+          
+          <div className="flex justify-between mb-6">
+            <div className="text-xl font-bold text-blue-600">المحاولات: {moves}</div>
+            <div className="text-xl font-bold text-green-600">التطابقات: {matches}/{EMOJIS.length}</div>
+          </div>
 
-        <div className="grid grid-cols-4 gap-2">
-          {cards.map((card, i) => (
+          <div className="grid grid-cols-4 gap-3 mb-6">
+            {cards.map((card) => (
+              <button
+                key={card.id}
+                onClick={() => handleCardClick(card.id)}
+                className={`aspect-square rounded-xl text-4xl font-bold transition-all transform ${
+                  card.isFlipped || card.isMatched
+                    ? 'bg-gradient-to-br from-yellow-400 to-orange-500 rotate-0'
+                    : 'bg-gradient-to-br from-blue-500 to-purple-600 hover:scale-105'
+                } ${card.isMatched ? 'opacity-50' : ''}`}
+              >
+                {card.isFlipped || card.isMatched ? card.emoji : '?'}
+              </button>
+            ))}
+          </div>
+
+          {gameWon && (
+            <div className="text-center bg-gradient-to-r from-green-400 to-teal-500 text-white p-6 rounded-2xl mb-6">
+              <div className="text-3xl font-bold mb-2">🎉 مبروك!</div>
+              <div className="text-xl">أكملت اللعبة في {moves} محاولة</div>
+            </div>
+          )}
+
+          <div className="flex gap-3">
             <button
-              key={card.id}
-              onClick={() => handleClick(i)}
-              className={`aspect-square rounded-xl text-3xl font-bold transition-all ${
-                card.flipped || card.matched
-                  ? 'bg-gradient-to-br from-yellow-200 to-orange-300'
-                  : 'bg-gradient-to-br from-purple-400 to-pink-500 hover:scale-105'
-              }`}
+              onClick={initializeGame}
+              className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 rounded-xl font-bold hover:from-blue-600 hover:to-purple-700 transition-all"
             >
-              {card.flipped || card.matched ? card.emoji : '?'}
-            </button>
-          ))}
-        </div>
-
-        {won && (
-          <div className="mt-4">
-            <p className="text-2xl font-bold text-green-600 mb-2">🎉 فزت!</p>
-            <button onClick={initGame} className="bg-purple-500 text-white px-8 py-3 rounded-xl font-bold">
               🔄 لعبة جديدة
             </button>
+            <button
+              onClick={() => router.push('/games')}
+              className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-300 transition-all"
+            >
+              🏠 العودة
+            </button>
           </div>
-        )}
-
-        <Link href="/dashboard" className="mt-4 inline-block text-gray-500 hover:text-gray-700">
-          ⬅️ رجوع
-        </Link>
+        </div>
       </div>
     </div>
-  )
+  );
 }
