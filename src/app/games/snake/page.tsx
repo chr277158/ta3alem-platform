@@ -7,6 +7,7 @@ import { playSound } from '@/lib/sounds';
 type Difficulty = 'easy' | 'medium' | 'hard';
 type Direction = 'up' | 'down' | 'left' | 'right';
 type FoodType = 'apple' | 'star' | 'bolt' | 'ice' | 'poison';
+type GameMode = 'classic' | 'survival' | 'timeattack' | 'nowalls' | 'hardmode';
 
 interface Particle {
   x: number;
@@ -15,6 +16,15 @@ interface Particle {
   vy: number;
   alpha: number;
   color: string;
+}
+
+interface FloatingText {
+  x: number;
+  y: number;
+  text: string;
+  alpha: number;
+  color: string;
+  vy: number;
 }
 
 interface SnakeSegment {
@@ -42,12 +52,22 @@ const FOOD_CONFIG: Record<FoodType, { emoji: string; points: number; color: stri
   poison: { emoji: '💀', points: 0, color: '#6c757d' },
 };
 
+const MODE_CONFIG: Record<GameMode, { label: string; emoji: string; description: string }> = {
+  classic: { label: 'Classic', emoji: '🎯', description: 'الوضع التقليدي' },
+  survival: { label: 'Survival', emoji: '🛡️', description: 'زيادة صعوبة تدريجية' },
+  timeattack: { label: 'Time Attack', emoji: '⏱️', description: 'احصل على أكبر نقطة في وقت محدود' },
+  nowalls: { label: 'No Walls', emoji: '↔️', description: 'اعبر من الطرف الآخر' },
+  hardmode: { label: 'Hard Mode', emoji: '🔥', description: 'أسرع وأصعب' },
+};
+
 const SOUND_KEY = 'game-sound-muted';
 const DIFFICULTY_KEY = 'snake-difficulty';
+const MODE_KEY = 'snake-mode';
 
 export default function SnakeGame() {
   const router = useRouter();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const shakeRef = useRef<HTMLDivElement | null>(null);
 
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
@@ -57,15 +77,19 @@ export default function SnakeGame() {
   const [isPaused, setIsPaused] = useState(false);
   const [showStartScreen, setShowStartScreen] = useState(true);
   const [difficulty, setDifficulty] = useState<Difficulty>('medium');
+  const [mode, setMode] = useState<GameMode>('classic');
   const [isNewRecord, setIsNewRecord] = useState(false);
   const [muted, setMuted] = useState(false);
   const [checking, setChecking] = useState(true);
   const [countdown, setCountdown] = useState<number | null>(null);
   const [timeAlive, setTimeAlive] = useState(0);
+  const [floatingTexts, setFloatingTexts] = useState<FloatingText[]>([]);
+  const [showSettings, setShowSettings] = useState(false);
 
   const GRID_SIZE = 20;
   const CELL_SIZE = 20;
   const CANVAS_SIZE = GRID_SIZE * CELL_SIZE;
+  const TIME_LIMIT = 120;
 
   const directionRef = useRef({ dx: 1, dy: 0, nextDx: 1, nextDy: 0 });
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
@@ -73,10 +97,9 @@ export default function SnakeGame() {
   const foodPulseRef = useRef(0);
   const snakeRef = useRef<SnakeSegment[]>([{ x: 10, y: 10 }]);
   const foodRef = useRef<Food>({ x: 15, y: 15, type: 'apple' });
-  const effectsRef = useRef<{ speedBoostUntil: number; slowUntil: number; poisonPenalty: boolean }>({
+  const effectsRef = useRef<{ speedBoostUntil: number; slowUntil: number }>({
     speedBoostUntil: 0,
     slowUntil: 0,
-    poisonPenalty: false,
   });
 
   const playSafe = useCallback((name: Parameters<typeof playSound>[0]) => {
@@ -86,12 +109,31 @@ export default function SnakeGame() {
   const levelFromScore = (s: number) => Math.floor(s / 50) + 1;
 
   const getCurrentSpeed = () => {
-    const baseSpeed = DIFFICULTY_CONFIG[difficulty].speed;
-    const currentLevel = levelFromScore(score);
-    const levelBonus = (currentLevel - 1) * 8;
+    let baseSpeed = DIFFICULTY_CONFIG[difficulty].speed;
+    if (mode === 'hardmode') baseSpeed -= 25;
+    if (mode === 'survival') baseSpeed -= (level - 1) * 3;
+    const levelBonus = (level - 1) * 8;
     const speedBoost = Date.now() < effectsRef.current.speedBoostUntil ? 20 : 0;
     const slowDown = Date.now() < effectsRef.current.slowUntil ? -20 : 0;
-    return Math.max(45, baseSpeed - levelBonus - speedBoost + slowDown);
+    return Math.max(40, baseSpeed - levelBonus - speedBoost + slowDown);
+  };
+
+  const isNoWalls = mode === 'nowalls';
+  const isTimeAttack = mode === 'timeattack';
+
+  const addFloatingText = (x: number, y: number, text: string, color = '#ffffff') => {
+    setFloatingTexts(prev => [
+      ...prev,
+      { x, y, text, alpha: 1, color, vy: -0.5 },
+    ]);
+  };
+
+  const flashShake = () => {
+    const el = shakeRef.current;
+    if (!el) return;
+    el.classList.remove('shake');
+    void el.offsetWidth;
+    el.classList.add('shake');
   };
 
   const handleDirection = useCallback((dir: Direction) => {
@@ -136,8 +178,9 @@ export default function SnakeGame() {
     setGameOver(true);
     setIsPlaying(false);
     setIsPaused(false);
+    flashShake();
     try {
-      const key = `snake_highscore_${difficulty}`;
+      const key = `snake_highscore_${difficulty}_${mode}`;
       const currentHigh = parseInt(localStorage.getItem(key) || '0', 10);
       if (score > currentHigh) {
         localStorage.setItem(key, score.toString());
@@ -159,17 +202,19 @@ export default function SnakeGame() {
       if (savedMute) setMuted(savedMute === 'true');
       const savedDifficulty = localStorage.getItem(DIFFICULTY_KEY) as Difficulty | null;
       if (savedDifficulty && savedDifficulty in DIFFICULTY_CONFIG) setDifficulty(savedDifficulty);
+      const savedMode = localStorage.getItem(MODE_KEY) as GameMode | null;
+      if (savedMode && savedMode in MODE_CONFIG) setMode(savedMode);
     } catch {}
   }, []);
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem(`snake_highscore_${difficulty}`);
+      const saved = localStorage.getItem(`snake_highscore_${difficulty}_${mode}`);
       setHighScore(saved ? parseInt(saved, 10) : 0);
     } catch {
       setHighScore(0);
     }
-  }, [difficulty]);
+  }, [difficulty, mode]);
 
   useEffect(() => {
     const userId = localStorage.getItem('userId');
@@ -202,8 +247,15 @@ export default function SnakeGame() {
 
     let animationFrameId: number;
     let intervalId: number;
+    let timeId: number;
     const snake = snakeRef.current;
     let food = foodRef.current;
+
+    const moveFloating = () => {
+      setFloatingTexts(prev => prev
+        .map(t => ({ ...t, y: t.y + t.vy, alpha: t.alpha - 0.03 }))
+        .filter(t => t.alpha > 0));
+    };
 
     const draw = () => {
       ctx.fillStyle = '#1a1a2e';
@@ -240,6 +292,7 @@ export default function SnakeGame() {
       foodPulseRef.current += 0.15;
       const pulseFactor = Math.sin(foodPulseRef.current) * 1.5;
       const foodCfg = FOOD_CONFIG[food.type];
+
       ctx.fillStyle = foodCfg.color;
       ctx.beginPath();
       ctx.roundRect(
@@ -304,6 +357,15 @@ export default function SnakeGame() {
         }
       });
 
+      floatingTexts.forEach(ft => {
+        ctx.save();
+        ctx.globalAlpha = ft.alpha;
+        ctx.fillStyle = ft.color;
+        ctx.font = 'bold 16px sans-serif';
+        ctx.fillText(ft.text, ft.x * CELL_SIZE + CELL_SIZE / 2, ft.y * CELL_SIZE);
+        ctx.restore();
+      });
+
       animationFrameId = requestAnimationFrame(draw);
     };
 
@@ -316,8 +378,7 @@ export default function SnakeGame() {
 
       const head = { x: snake[0].x + dx, y: snake[0].y + dy };
 
-      const noWalls = false;
-      if (noWalls) {
+      if (isNoWalls) {
         if (head.x < 0) head.x = GRID_SIZE - 1;
         if (head.x >= GRID_SIZE) head.x = 0;
         if (head.y < 0) head.y = GRID_SIZE - 1;
@@ -337,22 +398,26 @@ export default function SnakeGame() {
       snake.unshift(head);
 
       if (head.x === food.x && head.y === food.y) {
-        const points = FOOD_CONFIG[food.type].points;
+        const foodCfg = FOOD_CONFIG[food.type];
+
         if (food.type === 'apple' || food.type === 'star') {
-          setScore(s => s + points);
-          createParticles(food.x, food.y, FOOD_CONFIG[food.type].color);
+          setScore(s => s + foodCfg.points);
+          addFloatingText(food.x, food.y, `+${foodCfg.points}`, foodCfg.color);
+          createParticles(food.x, food.y, foodCfg.color);
           playSafe('correct');
         }
 
         if (food.type === 'bolt') {
           effectsRef.current.speedBoostUntil = Date.now() + 6000;
-          createParticles(food.x, food.y, FOOD_CONFIG[food.type].color);
+          addFloatingText(food.x, food.y, '⚡ SPEED', foodCfg.color);
+          createParticles(food.x, food.y, foodCfg.color);
           playSafe('powerup');
         }
 
         if (food.type === 'ice') {
           effectsRef.current.slowUntil = Date.now() + 6000;
-          createParticles(food.x, food.y, FOOD_CONFIG[food.type].color);
+          addFloatingText(food.x, food.y, '❄️ SLOW', foodCfg.color);
+          createParticles(food.x, food.y, foodCfg.color);
           playSafe('powerup');
         }
 
@@ -360,12 +425,9 @@ export default function SnakeGame() {
           if (snake.length > 2) snake.pop();
           if (snake.length > 2) snake.pop();
           setScore(s => Math.max(0, s - 10));
-          createParticles(food.x, food.y, FOOD_CONFIG[food.type].color);
+          addFloatingText(food.x, food.y, '-10', foodCfg.color);
+          createParticles(food.x, food.y, foodCfg.color);
           playSafe('wrong');
-        }
-
-        if (food.type === 'star') {
-          setScore(s => s + 30);
         }
 
         generateFood(snake);
@@ -395,40 +457,35 @@ export default function SnakeGame() {
     };
 
     const currentSpeed = getCurrentSpeed();
-    const timerStart = Date.now();
 
     window.addEventListener('keydown', handleKeyPress);
     intervalId = window.setInterval(move, currentSpeed);
-    animationFrameId = requestAnimationFrame(draw);
-
-    const timeId = window.setInterval(() => {
+    timeId = window.setInterval(() => {
       if (!isPaused) setTimeAlive(t => t + 1);
     }, 1000);
+    animationFrameId = requestAnimationFrame(draw);
 
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
       clearInterval(intervalId);
       clearInterval(timeId);
       cancelAnimationFrame(animationFrameId);
-      const elapsed = Math.floor((Date.now() - timerStart) / 1000);
-      if (elapsed > 0) setTimeAlive(prev => prev);
+      moveFloating();
     };
-  }, [isPlaying, gameOver, isPaused, difficulty, score, handleDirection, playSafe, countdown]);
+  }, [isPlaying, gameOver, isPaused, difficulty, score, handleDirection, playSafe, countdown, mode, floatingTexts.length]);
 
   useEffect(() => {
     setLevel(levelFromScore(score));
   }, [score]);
 
   useEffect(() => {
-    if (isPlaying && countdown === null) {
+    if (isPlaying && countdown !== null) {
       const id = setInterval(() => {
         setCountdown(prev => {
           if (prev === null) return 3;
           if (prev === 1) {
             clearInterval(id);
-            setTimeout(() => {
-              setCountdown(null);
-            }, 200);
+            setTimeout(() => setCountdown(null), 250);
             return 0;
           }
           return prev - 1;
@@ -436,7 +493,15 @@ export default function SnakeGame() {
       }, 1000);
       return () => clearInterval(id);
     }
-  }, [isPlaying]);
+  }, [isPlaying, countdown]);
+
+  useEffect(() => {
+    if (isTimeAttack && isPlaying && !gameOver) {
+      if (timeAlive >= TIME_LIMIT) {
+        endRound();
+      }
+    }
+  }, [timeAlive, isPlaying, gameOver, isTimeAttack]);
 
   const startGame = () => {
     directionRef.current = { dx: 1, dy: 0, nextDx: 1, nextDy: 0 };
@@ -452,8 +517,9 @@ export default function SnakeGame() {
     setIsPlaying(true);
     setShowStartScreen(false);
     setCountdown(3);
+    setFloatingTexts([]);
     particlesRef.current = [];
-    effectsRef.current = { speedBoostUntil: 0, slowUntil: 0, poisonPenalty: false };
+    effectsRef.current = { speedBoostUntil: 0, slowUntil: 0 };
     playSafe('click');
   };
 
@@ -461,6 +527,13 @@ export default function SnakeGame() {
     setDifficulty(level);
     try {
       localStorage.setItem(DIFFICULTY_KEY, level);
+    } catch {}
+  };
+
+  const selectMode = (m: GameMode) => {
+    setMode(m);
+    try {
+      localStorage.setItem(MODE_KEY, m);
     } catch {}
   };
 
@@ -495,6 +568,15 @@ export default function SnakeGame() {
       handleDirection(dy > 0 ? 'down' : 'up');
     }
     touchStartRef.current = null;
+  };
+
+  const toggleFullscreen = async () => {
+    const el = document.documentElement as HTMLElement & { webkitRequestFullscreen?: () => Promise<void> };
+    if (document.fullscreenElement) {
+      await document.exitFullscreen?.();
+    } else {
+      await el.requestFullscreen?.();
+    }
   };
 
   if (checking) {
@@ -533,9 +615,25 @@ export default function SnakeGame() {
                 ))}
               </div>
 
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                {(Object.keys(MODE_CONFIG) as GameMode[]).map(m => (
+                  <button
+                    key={m}
+                    onClick={() => selectMode(m)}
+                    className={`p-3 rounded-xl font-bold transition-all ${
+                      mode === m ? 'bg-purple-600 text-white shadow-lg' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    <div className="text-2xl mb-1">{MODE_CONFIG[m].emoji}</div>
+                    <div>{MODE_CONFIG[m].label}</div>
+                    <div className="text-xs opacity-80">{MODE_CONFIG[m].description}</div>
+                  </button>
+                ))}
+              </div>
+
               {highScore > 0 && (
                 <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-xl p-3 mb-6">
-                  <div className="text-sm">أعلى نتيجة لهذا المستوى</div>
+                  <div className="text-sm">أعلى نتيجة لهذا الوضع</div>
                   <div className="text-2xl font-bold">{highScore}</div>
                 </div>
               )}
@@ -557,7 +655,7 @@ export default function SnakeGame() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-6" dir="rtl">
       <div className="max-w-2xl mx-auto">
-        <div className="bg-white rounded-3xl shadow-2xl p-8">
+        <div ref={shakeRef} className="bg-white rounded-3xl shadow-2xl p-8">
           <div className="flex items-center justify-center gap-3 mb-6 relative">
             <h1 className="text-4xl font-bold text-center">🐍 لعبة الثعبان</h1>
             <button onClick={toggleMute} aria-label={muted ? 'إلغاء كتم الصوت' : 'كتم الصوت'} className="absolute left-0 bg-gray-100 hover:bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center text-xl">
@@ -567,15 +665,33 @@ export default function SnakeGame() {
 
           <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
             <div className="text-2xl font-bold text-blue-600">النقاط: {score}</div>
-            <div className="flex gap-2 items-center">
+            <div className="flex gap-2 items-center flex-wrap">
               <button onClick={() => setIsPaused(p => !p)} className="bg-purple-600 text-white px-4 py-1 rounded-full text-sm font-bold">
                 {isPaused ? '▶️ استئناف' : '⏸️ إيقاف (P)'}
+              </button>
+              <button onClick={toggleFullscreen} className="bg-gray-800 text-white px-4 py-1 rounded-full text-sm font-bold">
+                ⛶ Fullscreen
+              </button>
+              <button onClick={() => setShowSettings(v => !v)} className="bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-bold">
+                ⚙️ Settings
               </button>
               <span className={`${DIFFICULTY_CONFIG[difficulty].color} text-white px-3 py-1 rounded-full text-sm font-bold`}>
                 {DIFFICULTY_CONFIG[difficulty].emoji} {DIFFICULTY_CONFIG[difficulty].label}
               </span>
             </div>
           </div>
+
+          {showSettings && (
+            <div className="bg-gray-50 border rounded-2xl p-4 mb-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                {(Object.keys(MODE_CONFIG) as GameMode[]).map(m => (
+                  <button key={m} onClick={() => selectMode(m)} className={`p-3 rounded-xl font-bold ${mode === m ? 'bg-purple-600 text-white' : 'bg-white hover:bg-gray-100'}`}>
+                    {MODE_CONFIG[m].emoji} {MODE_CONFIG[m].label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4 text-sm">
             <div className="bg-gray-100 rounded-xl p-3 text-center"><div className="text-gray-500">Score</div><div className="text-xl font-bold">{score}</div></div>
@@ -645,6 +761,26 @@ export default function SnakeGame() {
           )}
         </div>
       </div>
+
+      <style jsx global>{`
+        .shake {
+          animation: shake 0.25s linear;
+        }
+        @keyframes shake {
+          0% { transform: translateX(0); }
+          25% { transform: translateX(-6px); }
+          50% { transform: translateX(6px); }
+          75% { transform: translateX(-6px); }
+          100% { transform: translateX(0); }
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.3s ease-out;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }
