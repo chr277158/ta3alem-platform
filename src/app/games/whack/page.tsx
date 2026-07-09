@@ -22,16 +22,22 @@ const DIFFICULTY_CONFIG = {
 };
 
 const GAME_DURATION = 30; // ثانية
+const SOUND_KEY = 'game-sound-muted';
+const DIFFICULTY_KEY = 'whack-difficulty';
+
+function createEmptyHoles(): Hole[] {
+  return Array(9).fill(null).map((_, i) => ({
+    id: i,
+    hasMole: false,
+    moleType: 'normal' as MoleType,
+    isHit: false
+  }));
+}
 
 export default function WhackGame() {
   const router = useRouter();
-  const [holes, setHoles] = useState<Hole[]>(Array(9).fill(null).map((_, i) => ({
-    id: i,
-    hasMole: false,
-    moleType: 'normal',
-    isHit: false
-  })));
-  
+  const [holes, setHoles] = useState<Hole[]>(createEmptyHoles());
+
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -44,15 +50,37 @@ export default function WhackGame() {
   const [highScore, setHighScore] = useState(0);
   const [lastHitId, setLastHitId] = useState<number | null>(null);
   const [showStartScreen, setShowStartScreen] = useState(true);
+  const [muted, setMuted] = useState(false);
+  const [checking, setChecking] = useState(true);
 
   const spawnTimerRef = useRef<NodeJS.Timeout | null>(null);
   const gameTimerRef = useRef<NodeJS.Timeout | null>(null);
   const moleTimersRef = useRef<Map<number, NodeJS.Timeout>>(new Map());
 
-  // تحميل أعلى نتيجة من localStorage
+  const playSafe = useCallback((name: Parameters<typeof playSound>[0]) => {
+    if (!muted) playSound(name);
+  }, [muted]);
+
+  // تحميل تفضيلات الصوت وآخر مستوى صعوبة مختار
   useEffect(() => {
-    const saved = localStorage.getItem(`whack_highscore_${difficulty}`);
-    if (saved) setHighScore(parseInt(saved));
+    try {
+      const savedMute = localStorage.getItem(SOUND_KEY);
+      if (savedMute) setMuted(savedMute === 'true');
+      const savedDifficulty = localStorage.getItem(DIFFICULTY_KEY) as Difficulty | null;
+      if (savedDifficulty && savedDifficulty in DIFFICULTY_CONFIG) setDifficulty(savedDifficulty);
+    } catch {
+      // تجاهل أخطاء القراءة
+    }
+  }, []);
+
+  // تحميل أعلى نتيجة لكل مستوى صعوبة (وتصفيرها إن لم توجد نتيجة محفوظة)
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(`whack_highscore_${difficulty}`);
+      setHighScore(saved ? parseInt(saved, 10) : 0);
+    } catch {
+      setHighScore(0);
+    }
   }, [difficulty]);
 
   // التحقق من أن اللعبة مفتوحة
@@ -69,8 +97,11 @@ export default function WhackGame() {
         if (!data.unlockedGames?.includes('whack')) {
           alert('🔒 يجب فتح شهادة المستوى 2 أولاً!');
           router.push('/games');
+        } else {
+          setChecking(false);
         }
-      });
+      })
+      .catch(() => setChecking(false));
   }, [router]);
 
   // تنظيف المؤقتات عند الخروج
@@ -81,6 +112,14 @@ export default function WhackGame() {
       moleTimersRef.current.forEach(timer => clearTimeout(timer));
     };
   }, []);
+
+  // إنهاء اللعبة عندما ينتهي الوقت (خارج دالة تحديث الحالة لتفادي التأثيرات الجانبية داخلها)
+  useEffect(() => {
+    if (isPlaying && timeLeft <= 0) {
+      endGame();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timeLeft, isPlaying]);
 
   // اختيار نوع الخلد عشوائياً
   const getRandomMoleType = useCallback((): MoleType => {
@@ -98,14 +137,18 @@ export default function WhackGame() {
 
       const randomHole = availableHoles[Math.floor(Math.random() * availableHoles.length)];
       const moleType = getRandomMoleType();
-      
-      const newHoles = prev.map(h => 
-        h.id === randomHole.id 
+
+      const newHoles = prev.map(h =>
+        h.id === randomHole.id
           ? { ...h, hasMole: true, moleType, isHit: false }
           : h
       );
 
-      // إخفاء الخلد بعد مدة
+      // يلغي أي مؤقت قديم متبقٍّ لنفس الثقب لتفادي تعارضه مع الخلد الجديد
+      const existingTimer = moleTimersRef.current.get(randomHole.id);
+      if (existingTimer) clearTimeout(existingTimer);
+
+      // إخفاء الخلد بعد مدة إن لم يُضرب
       const timer = setTimeout(() => {
         setHoles(current => {
           const hole = current.find(h => h.id === randomHole.id);
@@ -113,10 +156,11 @@ export default function WhackGame() {
             setMolesMissed(m => m + 1);
             setCombo(0);
           }
-          return current.map(h => 
+          return current.map(h =>
             h.id === randomHole.id ? { ...h, hasMole: false, moleType: 'normal', isHit: false } : h
           );
         });
+        moleTimersRef.current.delete(randomHole.id);
       }, DIFFICULTY_CONFIG[difficulty].moleDuration);
 
       moleTimersRef.current.set(randomHole.id, timer);
@@ -136,24 +180,16 @@ export default function WhackGame() {
     setMolesHit(0);
     setMolesMissed(0);
     setShowStartScreen(false);
-    setHoles(Array(9).fill(null).map((_, i) => ({
-      id: i,
-      hasMole: false,
-      moleType: 'normal',
-      isHit: false
-    })));
 
-    playSound('click');
+    moleTimersRef.current.forEach(timer => clearTimeout(timer));
+    moleTimersRef.current.clear();
+    setHoles(createEmptyHoles());
+
+    playSafe('click');
 
     // مؤقت اللعبة
     gameTimerRef.current = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          endGame();
-          return 0;
-        }
-        return prev - 1;
-      });
+      setTimeLeft(prev => (prev > 0 ? prev - 1 : 0));
     }, 1000);
 
     // مؤقت ظهور الخلد
@@ -166,20 +202,28 @@ export default function WhackGame() {
   const endGame = () => {
     setIsPlaying(false);
     setIsGameOver(true);
-    
+
     if (spawnTimerRef.current) clearInterval(spawnTimerRef.current);
     if (gameTimerRef.current) clearInterval(gameTimerRef.current);
     moleTimersRef.current.forEach(timer => clearTimeout(timer));
+    moleTimersRef.current.clear();
 
     // حفظ أعلى نتيجة
-    const key = `whack_highscore_${difficulty}`;
-    const currentHigh = parseInt(localStorage.getItem(key) || '0');
-    if (score > currentHigh) {
-      localStorage.setItem(key, score.toString());
-      setHighScore(score);
+    try {
+      const key = `whack_highscore_${difficulty}`;
+      const currentHigh = parseInt(localStorage.getItem(key) || '0', 10);
+      setScore(currentScore => {
+        if (currentScore > currentHigh) {
+          localStorage.setItem(key, currentScore.toString());
+          setHighScore(currentScore);
+        }
+        return currentScore;
+      });
+    } catch {
+      // تجاهل أخطاء التخزين
     }
 
-    playSound('achievement');
+    playSafe('achievement');
   };
 
   // الضغط على خلد
@@ -192,7 +236,7 @@ export default function WhackGame() {
           // خنزير! خصم نقاط
           setScore(s => Math.max(0, s - 20));
           setCombo(0);
-          playSound('wrong');
+          playSafe('wrong');
         } else {
           // خلد عادي أو ذهبي
           const points = h.moleType === 'golden' ? 30 : 10;
@@ -204,22 +248,28 @@ export default function WhackGame() {
             return newCombo;
           });
           setMolesHit(m => m + 1);
-          playSound(h.moleType === 'golden' ? 'achievement' : 'correct');
+          playSafe(h.moleType === 'golden' ? 'achievement' : 'correct');
         }
         setLastHitId(holeId);
         setTimeout(() => setLastHitId(null), 300);
-        
+
+        // يلغي مؤقت الإخفاء التلقائي القديم حتى لا يؤثر على خلد جديد يظهر في نفس الثقب لاحقًا
+        const existingTimer = moleTimersRef.current.get(holeId);
+        if (existingTimer) clearTimeout(existingTimer);
+
         return { ...h, isHit: true };
       }
       return h;
     }));
 
     // إخفاء الخلد بعد ضربه
-    setTimeout(() => {
-      setHoles(prev => prev.map(h => 
+    const hideTimer = setTimeout(() => {
+      setHoles(prev => prev.map(h =>
         h.id === holeId ? { ...h, hasMole: false, moleType: 'normal', isHit: false } : h
       ));
+      moleTimersRef.current.delete(holeId);
     }, 200);
+    moleTimersRef.current.set(holeId, hideTimer);
   };
 
   // الضغط على ثقب فارغ
@@ -228,7 +278,36 @@ export default function WhackGame() {
     setCombo(0);
   };
 
+  const toggleMute = () => {
+    setMuted(prev => {
+      const next = !prev;
+      try {
+        localStorage.setItem(SOUND_KEY, String(next));
+      } catch {
+        // تجاهل
+      }
+      return next;
+    });
+  };
+
+  const selectDifficulty = (level: Difficulty) => {
+    setDifficulty(level);
+    try {
+      localStorage.setItem(DIFFICULTY_KEY, level);
+    } catch {
+      // تجاهل
+    }
+  };
+
   const config = DIFFICULTY_CONFIG[difficulty];
+
+  if (checking) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center" dir="rtl">
+        <div className="text-2xl font-bold text-gray-500 animate-pulse">⏳ جارٍ التحميل...</div>
+      </div>
+    );
+  }
 
   // شاشة البداية
   if (showStartScreen) {
@@ -236,14 +315,23 @@ export default function WhackGame() {
       <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 p-6" dir="rtl">
         <div className="max-w-2xl mx-auto">
           <div className="bg-white rounded-3xl shadow-2xl p-8">
-            <h1 className="text-4xl font-bold text-center mb-6">🎯 اضرب الخلد</h1>
-            
+            <div className="flex items-center justify-center gap-3 mb-6 relative">
+              <h1 className="text-4xl font-bold text-center">🎯 اضرب الخلد</h1>
+              <button
+                onClick={toggleMute}
+                aria-label={muted ? 'تشغيل الصوت' : 'كتم الصوت'}
+                className="absolute left-0 bg-gray-100 hover:bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center text-xl transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
+              >
+                {muted ? '🔇' : '🔊'}
+              </button>
+            </div>
+
             <div className="text-center mb-8">
-              <div className="text-8xl mb-4 animate-bounce"></div>
+              <div className="text-8xl mb-4 animate-bounce">🐹</div>
               <p className="text-xl text-gray-600 mb-2">اضرب الخلدان قبل أن يختبئوا!</p>
               <div className="bg-yellow-50 rounded-xl p-4 mb-6">
                 <div className="text-sm text-gray-700 space-y-1">
-                  <div> خلد عادي = <span className="font-bold text-green-600">+10 نقاط</span></div>
+                  <div>🐹 خلد عادي = <span className="font-bold text-green-600">+10 نقاط</span></div>
                   <div>✨ خلد ذهبي = <span className="font-bold text-yellow-600">+30 نقطة</span></div>
                   <div>🐷 خنزير = <span className="font-bold text-red-600">-20 نقطة</span></div>
                   <div>🔥 كل 3 ضربات متتالية = <span className="font-bold text-purple-600">مكافأة!</span></div>
@@ -255,12 +343,13 @@ export default function WhackGame() {
                 {(['easy', 'medium', 'hard'] as Difficulty[]).map(level => (
                   <button
                     key={level}
-                    onClick={() => setDifficulty(level)}
+                    onClick={() => selectDifficulty(level)}
+                    aria-pressed={difficulty === level}
                     className={`p-4 rounded-xl font-bold transition-all ${
                       difficulty === level
                         ? `${DIFFICULTY_CONFIG[level].color} text-white scale-105 shadow-lg`
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
+                    } focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400`}
                   >
                     <div className="text-2xl mb-1">
                       {level === 'easy' && '😊'}
@@ -278,14 +367,14 @@ export default function WhackGame() {
 
               {highScore > 0 && (
                 <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-xl p-3 mb-6">
-                  <div className="text-sm"> أعلى نتيجة</div>
+                  <div className="text-sm">أعلى نتيجة</div>
                   <div className="text-2xl font-bold">{highScore}</div>
                 </div>
               )}
 
               <button
                 onClick={startGame}
-                className="w-full bg-gradient-to-r from-orange-500 to-red-600 text-white py-4 rounded-xl font-bold text-xl hover:from-orange-600 hover:to-red-700 transition-all transform hover:scale-105"
+                className="w-full bg-gradient-to-r from-orange-500 to-red-600 text-white py-4 rounded-xl font-bold text-xl hover:from-orange-600 hover:to-red-700 transition-all transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
               >
                 🎮 ابدأ اللعبة!
               </button>
@@ -293,7 +382,7 @@ export default function WhackGame() {
 
             <button
               onClick={() => router.push('/games')}
-              className="w-full bg-gray-200 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-300 transition-all"
+              className="w-full bg-gray-200 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-300 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400"
             >
               🏠 العودة للألعاب
             </button>
@@ -316,7 +405,7 @@ export default function WhackGame() {
             <div className="text-center">
               <div className="text-8xl mb-4 animate-bounce">{rating}</div>
               <h2 className="text-3xl font-bold mb-2">{message}</h2>
-              
+
               {isNewRecord && (
                 <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-xl p-3 mb-4 animate-pulse">
                   🎊 رقم قياسي جديد! 🎊
@@ -346,13 +435,13 @@ export default function WhackGame() {
               <div className="flex gap-3">
                 <button
                   onClick={startGame}
-                  className="flex-1 bg-gradient-to-r from-green-500 to-teal-600 text-white py-3 rounded-xl font-bold hover:from-green-600 hover:to-teal-700 transition-all"
+                  className="flex-1 bg-gradient-to-r from-green-500 to-teal-600 text-white py-3 rounded-xl font-bold hover:from-green-600 hover:to-teal-700 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400"
                 >
                   🔄 العب مرة أخرى
                 </button>
                 <button
                   onClick={() => router.push('/games')}
-                  className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-300 transition-all"
+                  className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-300 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400"
                 >
                   🏠 العودة
                 </button>
@@ -369,7 +458,16 @@ export default function WhackGame() {
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 p-6" dir="rtl">
       <div className="max-w-2xl mx-auto">
         <div className="bg-white rounded-3xl shadow-2xl p-6">
-          <h1 className="text-3xl font-bold text-center mb-4">🎯 اضرب الخلد</h1>
+          <div className="flex items-center justify-center gap-3 mb-4 relative">
+            <h1 className="text-3xl font-bold text-center">🎯 اضرب الخلد</h1>
+            <button
+              onClick={toggleMute}
+              aria-label={muted ? 'تشغيل الصوت' : 'كتم الصوت'}
+              className="absolute left-0 bg-gray-100 hover:bg-gray-200 rounded-full w-9 h-9 flex items-center justify-center text-lg transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
+            >
+              {muted ? '🔇' : '🔊'}
+            </button>
+          </div>
 
           {/* شريط المعلومات */}
           <div className="grid grid-cols-3 gap-3 mb-4">
@@ -402,18 +500,22 @@ export default function WhackGame() {
           <div className="grid grid-cols-3 gap-3 max-w-md mx-auto mb-4">
             {holes.map(hole => {
               const isLastHit = lastHitId === hole.id;
-              
+              const holeLabel = hole.hasMole
+                ? hole.moleType === 'golden' ? 'خلد ذهبي' : hole.moleType === 'bad' ? 'خنزير' : 'خلد عادي'
+                : 'ثقب فارغ';
+
               return (
                 <button
                   key={hole.id}
                   onClick={() => hole.hasMole ? whackMole(hole.id) : whackEmpty()}
+                  aria-label={holeLabel}
                   className={`aspect-square rounded-2xl relative overflow-hidden transition-all transform ${
                     isLastHit ? 'scale-95' : 'hover:scale-105'
                   } ${
-                    hole.hasMole 
-                      ? 'bg-gradient-to-br from-amber-200 to-orange-300 cursor-pointer' 
+                    hole.hasMole
+                      ? 'bg-gradient-to-br from-amber-200 to-orange-300 cursor-pointer'
                       : 'bg-gradient-to-br from-green-800 to-green-900'
-                  }`}
+                  } focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-300`}
                 >
                   {/* الثقب */}
                   <div className="absolute inset-0 flex items-end justify-center">
@@ -437,7 +539,7 @@ export default function WhackGame() {
                   {hole.isHit && (
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="text-5xl animate-ping">
-                        {hole.moleType === 'bad' ? '' : '💥'}
+                        {hole.moleType === 'bad' ? '💨' : '💥'}
                       </div>
                     </div>
                   )}
@@ -459,7 +561,7 @@ export default function WhackGame() {
           {/* زر الإنهاء المبكر */}
           <button
             onClick={endGame}
-            className="w-full bg-gray-200 text-gray-700 py-2 rounded-xl font-bold hover:bg-gray-300 transition-all text-sm"
+            className="w-full bg-gray-200 text-gray-700 py-2 rounded-xl font-bold hover:bg-gray-300 transition-all text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400"
           >
             ⏹️ إنهاء اللعبة
           </button>
