@@ -9,7 +9,8 @@ const AVAILABLE_GAMES = [
   { id: 'tictactoe', name: 'إكس أو', icon: '⭕', color: 'from-blue-400 to-blue-600' },
   { id: 'whack', name: 'اضرب الخلد', icon: '', color: 'from-orange-400 to-orange-600' },
   { id: 'rps', name: 'حجر ورقة مقص', icon: '✂️', color: 'from-pink-400 to-pink-600' },
-  { id: 'simon', name: 'سايمون', icon: '🎵', color: 'from-indigo-400 to-indigo-600' }
+  { id: 'simon', name: 'سايمون', icon: '🎵', color: 'from-indigo-400 to-indigo-600' },
+  { id: 'pingpong', name: 'بينج بونج', icon: '🎮', color: 'from-indigo-400 to-indigo-600' }
 ];
 export default function GamesPage() {
   const router = useRouter();
