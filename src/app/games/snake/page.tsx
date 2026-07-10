@@ -84,7 +84,6 @@ export default function SnakeGame() {
   const [countdown, setCountdown] = useState<number | null>(null);
   const [timeAlive, setTimeAlive] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
-  const [floatingTexts, setFloatingTexts] = useState<FloatingText[]>([]);
 
   const GRID_SIZE = 20;
   const CELL_SIZE = 20;
@@ -94,6 +93,7 @@ export default function SnakeGame() {
   const directionRef = useRef({ dx: 1, dy: 0, nextDx: 1, nextDy: 0 });
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const particlesRef = useRef<Particle[]>([]);
+  const floatingTextsRef = useRef<FloatingText[]>([]);
   const foodPulseRef = useRef(0);
   const snakeRef = useRef<SnakeSegment[]>([{ x: 10, y: 10 }]);
   const foodRef = useRef<Food>({ x: 15, y: 15, type: 'apple' });
@@ -101,6 +101,7 @@ export default function SnakeGame() {
     speedBoostUntil: 0,
     slowUntil: 0,
   });
+  const timeAliveRef = useRef(0);
 
   const playSafe = useCallback((name: Parameters<typeof playSound>[0]) => {
     if (!muted) playSound(name);
@@ -121,7 +122,7 @@ export default function SnakeGame() {
   };
 
   const addFloatingText = (x: number, y: number, text: string, color = '#ffffff') => {
-    setFloatingTexts(prev => [...prev, { x, y, text, alpha: 1, vy: -0.25, color }]);
+    floatingTextsRef.current.push({ x, y, text, alpha: 1, vy: -0.25, color });
   };
 
   const flashShake = () => {
@@ -175,6 +176,7 @@ export default function SnakeGame() {
     setIsPlaying(false);
     setIsPaused(false);
     flashShake();
+    playSafe('wrong');
 
     try {
       const key = `snake_highscore_${difficulty}_${mode}`;
@@ -186,11 +188,8 @@ export default function SnakeGame() {
         playSafe('achievement');
       } else {
         setIsNewRecord(false);
-        playSafe('wrong');
       }
-    } catch {
-      playSafe('wrong');
-    }
+    } catch {}
   };
 
   useEffect(() => {
@@ -242,13 +241,15 @@ export default function SnakeGame() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let animationFrameId = 0;
     let intervalId = 0;
+    let animationFrameId = 0;
     let timeId = 0;
-    const snake = snakeRef.current;
-    let food = foodRef.current;
+    let timeAttackId = 0;
 
     const draw = () => {
+      const snake = snakeRef.current;
+      const food = foodRef.current;
+
       ctx.fillStyle = '#1a1a2e';
       ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
@@ -283,7 +284,6 @@ export default function SnakeGame() {
       foodPulseRef.current += 0.15;
       const pulseFactor = Math.sin(foodPulseRef.current) * 1.5;
       const foodCfg = FOOD_CONFIG[food.type];
-
       ctx.fillStyle = foodCfg.color;
       ctx.beginPath();
       ctx.roundRect(
@@ -303,15 +303,8 @@ export default function SnakeGame() {
       snake.forEach((segment, index) => {
         const isHead = index === 0;
         ctx.fillStyle = isHead ? '#4ecdc4' : '#45b7aa';
-
         ctx.beginPath();
-        ctx.roundRect(
-          segment.x * CELL_SIZE + 1,
-          segment.y * CELL_SIZE + 1,
-          CELL_SIZE - 2,
-          CELL_SIZE - 2,
-          isHead ? 8 : 6
-        );
+        ctx.roundRect(segment.x * CELL_SIZE + 1, segment.y * CELL_SIZE + 1, CELL_SIZE - 2, CELL_SIZE - 2, isHead ? 8 : 6);
         ctx.fill();
 
         if (isHead) {
@@ -348,12 +341,11 @@ export default function SnakeGame() {
         }
       });
 
-      setFloatingTexts(prev => prev
+      floatingTextsRef.current = floatingTextsRef.current
         .map(t => ({ ...t, y: t.y + t.vy, alpha: t.alpha - 0.03 }))
-        .filter(t => t.alpha > 0)
-      );
+        .filter(t => t.alpha > 0);
 
-      floatingTexts.forEach(ft => {
+      floatingTextsRef.current.forEach(ft => {
         ctx.save();
         ctx.globalAlpha = ft.alpha;
         ctx.fillStyle = ft.color;
@@ -369,6 +361,9 @@ export default function SnakeGame() {
 
     const move = () => {
       if (isPaused) return;
+
+      const snake = snakeRef.current;
+      const food = foodRef.current;
 
       directionRef.current.dx = directionRef.current.nextDx;
       directionRef.current.dy = directionRef.current.nextDy;
@@ -456,18 +451,28 @@ export default function SnakeGame() {
 
     window.addEventListener('keydown', handleKeyPress);
     intervalId = window.setInterval(move, getCurrentSpeed());
-    timeId = window.setInterval(() => {
-      if (!isPaused) setTimeAlive(t => t + 1);
-    }, 1000);
     animationFrameId = requestAnimationFrame(draw);
+    timeId = window.setInterval(() => {
+      if (!isPaused) {
+        timeAliveRef.current += 1;
+        setTimeAlive(timeAliveRef.current);
+      }
+    }, 1000);
+
+    if (isTimeAttack) {
+      timeAttackId = window.setInterval(() => {
+        if (timeAliveRef.current >= TIME_LIMIT) endRound();
+      }, 500);
+    }
 
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
       clearInterval(intervalId);
       clearInterval(timeId);
+      clearInterval(timeAttackId);
       cancelAnimationFrame(animationFrameId);
     };
-  }, [isPlaying, gameOver, isPaused, difficulty, score, handleDirection, playSafe, countdown, mode, floatingTexts]);
+  }, [isPlaying, gameOver, isPaused, difficulty, countdown, mode, level, score, handleDirection]);
 
   useEffect(() => {
     setLevel(levelFromScore(score));
@@ -490,12 +495,6 @@ export default function SnakeGame() {
     }
   }, [isPlaying, countdown]);
 
-  useEffect(() => {
-    if (isTimeAttack && isPlaying && !gameOver && timeAlive >= TIME_LIMIT) {
-      endRound();
-    }
-  }, [timeAlive, isPlaying, gameOver, isTimeAttack]);
-
   const startGame = () => {
     directionRef.current = { dx: 1, dy: 0, nextDx: 1, nextDy: 0 };
     snakeRef.current = [{ x: 10, y: 10 }];
@@ -504,13 +503,15 @@ export default function SnakeGame() {
     setScore(0);
     setLevel(1);
     setTimeAlive(0);
+    timeAliveRef.current = 0;
     setGameOver(false);
     setIsPaused(false);
     setIsNewRecord(false);
     setIsPlaying(true);
     setShowStartScreen(false);
     setCountdown(3);
-    setFloatingTexts([]);
+    setShowSettings(false);
+    floatingTextsRef.current = [];
     particlesRef.current = [];
     effectsRef.current = { speedBoostUntil: 0, slowUntil: 0 };
     playSafe('click');

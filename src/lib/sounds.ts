@@ -113,3 +113,20 @@ export function playWrongSound(): void {
 export function playAchievementSound(): void {
   playSound('achievement');
 }
+type SoundName = 'click' | 'correct' | 'powerup' | 'wrong' | 'achievement';
+
+const soundMap: Record<SoundName, string> = {
+  click: '/sounds/click.wav',
+  correct: '/sounds/eat.wav',
+  powerup: '/sounds/powerup.wav',
+  wrong: '/sounds/gameover.wav',
+  achievement: '/sounds/achievement.wav',
+};
+
+export function playSound(name: SoundName) {
+  try {
+    const audio = new Audio(soundMap[name]);
+    audio.volume = 0.6;
+    audio.play().catch(() => {});
+  } catch {}
+}
