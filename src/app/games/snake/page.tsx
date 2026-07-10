@@ -83,7 +83,19 @@ export default function SnakeGame() {
   const [checking, setChecking] = useState(true);
   const [countdown, setCountdown] = useState<number | null>(null);
   const [timeAlive, setTimeAlive] = useState(0);
-  const [floatingTexts, setFloatingTexts] = useState<FloatingText[]>([]);
+  //const [floatingTexts, setFloatingTexts] = useState<FloatingText[]>([]);
+  const floatingTextsRef = useRef< { x: number; y: number; text: string; alpha: number; vy: number; color: string }[] >([]);
+
+const addFloatingText = (x: number, y: number, text: string, color = '#ffffff') => {
+  floatingTextsRef.current.push({
+    x,
+    y,
+    text,
+    alpha: 1,
+    vy: -0.25,
+    color,
+  });
+};
   const [showSettings, setShowSettings] = useState(false);
 
   const GRID_SIZE = 20;
@@ -121,12 +133,12 @@ export default function SnakeGame() {
   const isNoWalls = mode === 'nowalls';
   const isTimeAttack = mode === 'timeattack';
 
-  const addFloatingText = (x: number, y: number, text: string, color = '#ffffff') => {
-    setFloatingTexts(prev => [
-      ...prev,
-      { x, y, text, alpha: 1, color, vy: -0.5 },
-    ]);
-  };
+  //const addFloatingText = (x: number, y: number, text: string, color = '#ffffff') => {
+   // setFloatingTexts(prev => [
+    //  ...prev,
+   //   { x, y, text, alpha: 1, color, vy: -0.5 },
+  //  ]);
+ // };
 
   const flashShake = () => {
     const el = shakeRef.current;
@@ -357,15 +369,30 @@ export default function SnakeGame() {
         }
       });
 
-      floatingTexts.forEach(ft => {
-        ctx.save();
-        ctx.globalAlpha = ft.alpha;
-        ctx.fillStyle = ft.color;
-        ctx.font = 'bold 16px sans-serif';
-        ctx.fillText(ft.text, ft.x * CELL_SIZE + CELL_SIZE / 2, ft.y * CELL_SIZE);
-        ctx.restore();
-      });
+     // floatingTexts.forEach(ft => {
+      //  ctx.save();
+      //  ctx.globalAlpha = ft.alpha;
+      //  ctx.fillStyle = ft.color;
+      //  ctx.font = 'bold 16px sans-serif';
+       // ctx.fillText(ft.text, ft.x * CELL_SIZE + CELL_SIZE / 2, ft.y * CELL_SIZE);
+       // ctx.restore();
+     // });
+floatingTextsRef.current = floatingTextsRef.current.filter(item => {
+  item.y += item.vy;
+  item.alpha -= 0.03;
+  if (item.alpha <= 0) return false;
 
+  ctx.save();
+  ctx.globalAlpha = item.alpha;
+  ctx.fillStyle = item.color;
+  ctx.font = 'bold 16px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(item.text, item.x * CELL_SIZE + CELL_SIZE / 2, item.y * CELL_SIZE);
+  ctx.restore();
+
+  return true;
+});
       animationFrameId = requestAnimationFrame(draw);
     };
 
@@ -402,7 +429,8 @@ export default function SnakeGame() {
 
         if (food.type === 'apple' || food.type === 'star') {
           setScore(s => s + foodCfg.points);
-          addFloatingText(food.x, food.y, `+${foodCfg.points}`, foodCfg.color);
+         // addFloatingText(food.x, food.y, `+${foodCfg.points}`, foodCfg.color);
+         addFloatingText(food.x, food.y, '+10', '#ffffff');
           createParticles(food.x, food.y, foodCfg.color);
           playSafe('correct');
         }
