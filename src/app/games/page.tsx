@@ -5,9 +5,10 @@ import { useRouter } from 'next/navigation';
 
 const AVAILABLE_GAMES = [
   { id: 'snake', name: 'الثعبان', icon: '🐍', color: 'from-green-400 to-green-600' },
-  { id: 'memory', name: 'الذاكرة', icon: '🧠', color: 'from-purple-400 to-purple-600' },
+  { id: 'memory', name: 'الذاكرة', icon: '', color: 'from-purple-400 to-purple-600' },
   { id: 'tictactoe', name: 'إكس أو', icon: '⭕', color: 'from-blue-400 to-blue-600' },
-  { id: 'whack', name: 'اضرب الخلد', icon: '🎯', color: 'from-orange-400 to-orange-600' }
+  { id: 'whack', name: 'اضرب الخلد', icon: '', color: 'from-orange-400 to-orange-600' },
+  { id: 'rps', name: 'حجر ورقة مقص', icon: '✂️', color: 'from-pink-400 to-pink-600' }
 ];
 
 export default function GamesPage() {
