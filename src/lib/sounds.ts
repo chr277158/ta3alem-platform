@@ -11,7 +11,7 @@ function getAudioContext(): AudioContext {
 }
 
 // دالة موحدة لتشغيل الأصوات
-export function playSound(soundName: string): void {
+export function playSynthSound(soundName: string): void {
   if (typeof window === 'undefined') return;
 
   const ctx = getAudioContext();
@@ -116,11 +116,11 @@ export function playAchievementSound(): void {
 type SoundName = 'click' | 'correct' | 'powerup' | 'wrong' | 'achievement';
 
 const soundMap: Record<SoundName, string> = {
-  click: '/sounds/click.wav',
-  correct: '/sounds/eat.wav',
-  powerup: '/sounds/powerup.wav',
-  wrong: '/sounds/gameover.wav',
-  achievement: '/sounds/achievement.wav',
+  click: '/sounds/click.mp3',
+  correct: '/sounds/eat.mp3',
+  powerup: '/sounds/powerup.mp3',
+  wrong: '/sounds/gameover.mp3',
+  achievement: '/sounds/achievement.mp3',
 };
 
 export function playSound(name: SoundName) {
