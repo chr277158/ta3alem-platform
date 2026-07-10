@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { playSound } from '@/lib/sounds';
 
@@ -23,8 +23,8 @@ interface FloatingText {
   y: number;
   text: string;
   alpha: number;
-  color: string;
   vy: number;
+  color: string;
 }
 
 interface SnakeSegment {
@@ -47,16 +47,16 @@ const DIFFICULTY_CONFIG: Record<Difficulty, { speed: number; emoji: string; labe
 const FOOD_CONFIG: Record<FoodType, { emoji: string; points: number; color: string }> = {
   apple: { emoji: '🍎', points: 10, color: '#ff6b6b' },
   star: { emoji: '⭐', points: 30, color: '#ffd93d' },
-  bolt: { emoji: '⚡', points: 5, color: '#4d96ff' },
-  ice: { emoji: '❄️', points: 1, color: '#8ecae6' },
+  bolt: { emoji: '⚡', points: 0, color: '#4d96ff' },
+  ice: { emoji: '❄️', points: 0, color: '#8ecae6' },
   poison: { emoji: '💀', points: 0, color: '#6c757d' },
 };
 
 const MODE_CONFIG: Record<GameMode, { label: string; emoji: string; description: string }> = {
   classic: { label: 'Classic', emoji: '🎯', description: 'الوضع التقليدي' },
-  survival: { label: 'Survival', emoji: '🛡️', description: 'زيادة صعوبة تدريجية' },
-  timeattack: { label: 'Time Attack', emoji: '⏱️', description: 'احصل على أكبر نقطة في وقت محدود' },
-  nowalls: { label: 'No Walls', emoji: '↔️', description: 'اعبر من الطرف الآخر' },
+  survival: { label: 'Survival', emoji: '🛡️', description: 'يزيد الصعوبة تدريجيًا' },
+  timeattack: { label: 'Time Attack', emoji: '⏱️', description: 'وقت محدود' },
+  nowalls: { label: 'No Walls', emoji: '↔️', description: 'عبور من الطرف الآخر' },
   hardmode: { label: 'Hard Mode', emoji: '🔥', description: 'أسرع وأصعب' },
 };
 
@@ -83,20 +83,8 @@ export default function SnakeGame() {
   const [checking, setChecking] = useState(true);
   const [countdown, setCountdown] = useState<number | null>(null);
   const [timeAlive, setTimeAlive] = useState(0);
-  //const [floatingTexts, setFloatingTexts] = useState<FloatingText[]>([]);
-  const floatingTextsRef = useRef< { x: number; y: number; text: string; alpha: number; vy: number; color: string }[] >([]);
-
-const addFloatingText = (x: number, y: number, text: string, color = '#ffffff') => {
-  floatingTextsRef.current.push({
-    x,
-    y,
-    text,
-    alpha: 1,
-    vy: -0.25,
-    color,
-  });
-};
   const [showSettings, setShowSettings] = useState(false);
+  const [floatingTexts, setFloatingTexts] = useState<FloatingText[]>([]);
 
   const GRID_SIZE = 20;
   const CELL_SIZE = 20;
@@ -119,6 +107,8 @@ const addFloatingText = (x: number, y: number, text: string, color = '#ffffff') 
   }, [muted]);
 
   const levelFromScore = (s: number) => Math.floor(s / 50) + 1;
+  const isNoWalls = mode === 'nowalls';
+  const isTimeAttack = mode === 'timeattack';
 
   const getCurrentSpeed = () => {
     let baseSpeed = DIFFICULTY_CONFIG[difficulty].speed;
@@ -130,15 +120,9 @@ const addFloatingText = (x: number, y: number, text: string, color = '#ffffff') 
     return Math.max(40, baseSpeed - levelBonus - speedBoost + slowDown);
   };
 
-  const isNoWalls = mode === 'nowalls';
-  const isTimeAttack = mode === 'timeattack';
-
-  //const addFloatingText = (x: number, y: number, text: string, color = '#ffffff') => {
-   // setFloatingTexts(prev => [
-    //  ...prev,
-   //   { x, y, text, alpha: 1, color, vy: -0.5 },
-  //  ]);
- // };
+  const addFloatingText = (x: number, y: number, text: string, color = '#ffffff') => {
+    setFloatingTexts(prev => [...prev, { x, y, text, alpha: 1, vy: -0.25, color }]);
+  };
 
   const flashShake = () => {
     const el = shakeRef.current;
@@ -191,6 +175,7 @@ const addFloatingText = (x: number, y: number, text: string, color = '#ffffff') 
     setIsPlaying(false);
     setIsPaused(false);
     flashShake();
+
     try {
       const key = `snake_highscore_${difficulty}_${mode}`;
       const currentHigh = parseInt(localStorage.getItem(key) || '0', 10);
@@ -257,17 +242,11 @@ const addFloatingText = (x: number, y: number, text: string, color = '#ffffff') 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let animationFrameId: number;
-    let intervalId: number;
-    let timeId: number;
+    let animationFrameId = 0;
+    let intervalId = 0;
+    let timeId = 0;
     const snake = snakeRef.current;
     let food = foodRef.current;
-
-    const moveFloating = () => {
-      setFloatingTexts(prev => prev
-        .map(t => ({ ...t, y: t.y + t.vy, alpha: t.alpha - 0.03 }))
-        .filter(t => t.alpha > 0));
-    };
 
     const draw = () => {
       ctx.fillStyle = '#1a1a2e';
@@ -369,30 +348,22 @@ const addFloatingText = (x: number, y: number, text: string, color = '#ffffff') 
         }
       });
 
-     // floatingTexts.forEach(ft => {
-      //  ctx.save();
-      //  ctx.globalAlpha = ft.alpha;
-      //  ctx.fillStyle = ft.color;
-      //  ctx.font = 'bold 16px sans-serif';
-       // ctx.fillText(ft.text, ft.x * CELL_SIZE + CELL_SIZE / 2, ft.y * CELL_SIZE);
-       // ctx.restore();
-     // });
-floatingTextsRef.current = floatingTextsRef.current.filter(item => {
-  item.y += item.vy;
-  item.alpha -= 0.03;
-  if (item.alpha <= 0) return false;
+      setFloatingTexts(prev => prev
+        .map(t => ({ ...t, y: t.y + t.vy, alpha: t.alpha - 0.03 }))
+        .filter(t => t.alpha > 0)
+      );
 
-  ctx.save();
-  ctx.globalAlpha = item.alpha;
-  ctx.fillStyle = item.color;
-  ctx.font = 'bold 16px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(item.text, item.x * CELL_SIZE + CELL_SIZE / 2, item.y * CELL_SIZE);
-  ctx.restore();
+      floatingTexts.forEach(ft => {
+        ctx.save();
+        ctx.globalAlpha = ft.alpha;
+        ctx.fillStyle = ft.color;
+        ctx.font = 'bold 16px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(ft.text, ft.x * CELL_SIZE + CELL_SIZE / 2, ft.y * CELL_SIZE);
+        ctx.restore();
+      });
 
-  return true;
-});
       animationFrameId = requestAnimationFrame(draw);
     };
 
@@ -429,8 +400,7 @@ floatingTextsRef.current = floatingTextsRef.current.filter(item => {
 
         if (food.type === 'apple' || food.type === 'star') {
           setScore(s => s + foodCfg.points);
-         // addFloatingText(food.x, food.y, `+${foodCfg.points}`, foodCfg.color);
-         addFloatingText(food.x, food.y, '+10', '#ffffff');
+          addFloatingText(food.x, food.y, `+${foodCfg.points}`, foodCfg.color);
           createParticles(food.x, food.y, foodCfg.color);
           playSafe('correct');
         }
@@ -484,10 +454,8 @@ floatingTextsRef.current = floatingTextsRef.current.filter(item => {
       }
     };
 
-    const currentSpeed = getCurrentSpeed();
-
     window.addEventListener('keydown', handleKeyPress);
-    intervalId = window.setInterval(move, currentSpeed);
+    intervalId = window.setInterval(move, getCurrentSpeed());
     timeId = window.setInterval(() => {
       if (!isPaused) setTimeAlive(t => t + 1);
     }, 1000);
@@ -498,9 +466,8 @@ floatingTextsRef.current = floatingTextsRef.current.filter(item => {
       clearInterval(intervalId);
       clearInterval(timeId);
       cancelAnimationFrame(animationFrameId);
-      moveFloating();
     };
-  }, [isPlaying, gameOver, isPaused, difficulty, score, handleDirection, playSafe, countdown, mode, floatingTexts.length]);
+  }, [isPlaying, gameOver, isPaused, difficulty, score, handleDirection, playSafe, countdown, mode, floatingTexts]);
 
   useEffect(() => {
     setLevel(levelFromScore(score));
@@ -524,10 +491,8 @@ floatingTextsRef.current = floatingTextsRef.current.filter(item => {
   }, [isPlaying, countdown]);
 
   useEffect(() => {
-    if (isTimeAttack && isPlaying && !gameOver) {
-      if (timeAlive >= TIME_LIMIT) {
-        endRound();
-      }
+    if (isTimeAttack && isPlaying && !gameOver && timeAlive >= TIME_LIMIT) {
+      endRound();
     }
   }, [timeAlive, isPlaying, gameOver, isTimeAttack]);
 
@@ -618,7 +583,7 @@ floatingTextsRef.current = floatingTextsRef.current.filter(item => {
           <div className="bg-white rounded-3xl shadow-2xl p-8">
             <div className="flex items-center justify-center gap-3 mb-6 relative">
               <h1 className="text-4xl font-bold text-center">🐍 لعبة الثعبان</h1>
-              <button onClick={toggleMute} aria-label={muted ? 'إلغاء كتم الصوت' : 'كتم الصوت'} className="absolute left-0 bg-gray-100 hover:bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center text-xl">
+              <button onClick={toggleMute} className="absolute left-0 bg-gray-100 hover:bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center text-xl">
                 {muted ? '🔇' : '🔊'}
               </button>
             </div>
@@ -686,7 +651,7 @@ floatingTextsRef.current = floatingTextsRef.current.filter(item => {
         <div ref={shakeRef} className="bg-white rounded-3xl shadow-2xl p-8">
           <div className="flex items-center justify-center gap-3 mb-6 relative">
             <h1 className="text-4xl font-bold text-center">🐍 لعبة الثعبان</h1>
-            <button onClick={toggleMute} aria-label={muted ? 'إلغاء كتم الصوت' : 'كتم الصوت'} className="absolute left-0 bg-gray-100 hover:bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center text-xl">
+            <button onClick={toggleMute} className="absolute left-0 bg-gray-100 hover:bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center text-xl">
               {muted ? '🔇' : '🔊'}
             </button>
           </div>
@@ -754,14 +719,13 @@ floatingTextsRef.current = floatingTextsRef.current.filter(item => {
             <>
               <div className="text-center text-sm text-gray-500 mb-4">استخدم الأسهم أو السحب للتحرك، وزر P للإيقاف</div>
 
-              <div className="grid grid-cols-3 gap-2 max-w-[180px] mx-auto mb-6">
+              <div className="grid grid-cols-3 gap-2 max-w-[180px] mx-auto mb-6" dir="ltr">
                 <div />
                 <button onClick={() => handleDirection('up')} className="bg-purple-100 hover:bg-purple-200 rounded-xl py-3 text-2xl transition-all">⬆️</button>
                 <div />
-                <button onClick={() => handleDirection('right')} className="bg-purple-100 hover:bg-purple-200 rounded-xl py-3 text-2xl transition-all">➡️</button>
-                
-                <div />
                 <button onClick={() => handleDirection('left')} className="bg-purple-100 hover:bg-purple-200 rounded-xl py-3 text-2xl transition-all">⬅️</button>
+                <div />
+                <button onClick={() => handleDirection('right')} className="bg-purple-100 hover:bg-purple-200 rounded-xl py-3 text-2xl transition-all">➡️</button>
                 <div />
                 <button onClick={() => handleDirection('down')} className="bg-purple-100 hover:bg-purple-200 rounded-xl py-3 text-2xl transition-all">⬇️</button>
                 <div />
