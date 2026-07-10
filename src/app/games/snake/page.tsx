@@ -47,8 +47,8 @@ const DIFFICULTY_CONFIG: Record<Difficulty, { speed: number; emoji: string; labe
 const FOOD_CONFIG: Record<FoodType, { emoji: string; points: number; color: string }> = {
   apple: { emoji: '🍎', points: 10, color: '#ff6b6b' },
   star: { emoji: '⭐', points: 30, color: '#ffd93d' },
-  bolt: { emoji: '⚡', points: 0, color: '#4d96ff' },
-  ice: { emoji: '❄️', points: 0, color: '#8ecae6' },
+  bolt: { emoji: '⚡', points: 5, color: '#4d96ff' },
+  ice: { emoji: '❄️', points: 1, color: '#8ecae6' },
   poison: { emoji: '💀', points: 0, color: '#6c757d' },
 };
 
@@ -758,9 +758,10 @@ floatingTextsRef.current = floatingTextsRef.current.filter(item => {
                 <div />
                 <button onClick={() => handleDirection('up')} className="bg-purple-100 hover:bg-purple-200 rounded-xl py-3 text-2xl transition-all">⬆️</button>
                 <div />
-                <button onClick={() => handleDirection('left')} className="bg-purple-100 hover:bg-purple-200 rounded-xl py-3 text-2xl transition-all">⬅️</button>
-                <div />
                 <button onClick={() => handleDirection('right')} className="bg-purple-100 hover:bg-purple-200 rounded-xl py-3 text-2xl transition-all">➡️</button>
+                
+                <div />
+                <button onClick={() => handleDirection('left')} className="bg-purple-100 hover:bg-purple-200 rounded-xl py-3 text-2xl transition-all">⬅️</button>
                 <div />
                 <button onClick={() => handleDirection('down')} className="bg-purple-100 hover:bg-purple-200 rounded-xl py-3 text-2xl transition-all">⬇️</button>
                 <div />
