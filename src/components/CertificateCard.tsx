@@ -109,6 +109,7 @@ export default function CertificateCard({
             <div className="text-center">
               <p className="text-gray-500 text-sm">توقيع المدير</p>
               <p className="font-bold text-gray-800 font-serif text-xl">مدير المنصة</p>
+              <p className="font-bold text-gray-800 font-serif text-xl">شراز غضبان</p>
             </div>
           </div>
         </div>
