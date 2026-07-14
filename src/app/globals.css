@@ -87,3 +87,63 @@
 .animate-glow {
   animation: glow 2s infinite;
 }
+
+
+/* تأثير ختم الشهادة */
+@keyframes stamp {
+  0% { transform: scale(2) rotate(-15deg); opacity: 0; }
+  100% { transform: scale(1) rotate(-5deg); opacity: 0.8; }
+}
+.animate-stamp {
+  animation: stamp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* تأثير توهج الحدود */
+@keyframes border-glow {
+  0%, 100% { box-shadow: 0 0 10px rgba(212, 175, 55, 0.3); }
+  50% { box-shadow: 0 0 25px rgba(212, 175, 55, 0.6); }
+}
+.animate-border-glow {
+  animation: border-glow 3s infinite;
+}
+
+/* ==========================================
+   تنسيقات الطباعة (Print Styles)
+   ========================================== */
+@media print {
+  /* إخفاء كل شيء في الصفحة افتراضياً */
+  body * {
+    visibility: hidden;
+  }
+  
+  /* إظهار فقط عنصر الشهادة القابل للطباعة */
+  .printable-certificate,
+  .printable-certificate * {
+    visibility: visible;
+  }
+
+  /* تنسيق الشهادة للطباعة */
+  .printable-certificate {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 40px;
+    background: white !important;
+    color: black !important;
+    border: 8px double #d4af37 !important; /* إطار ذهبي */
+    box-shadow: none !important;
+  }
+
+  /* إخفاء الأزرار والعناصر غير المرغوب فيها عند الطباعة */
+  .no-print {
+    display: none !important;
+  }
+
+  /* تحسين جودة الخطوط والألوان للطباعة */
+  .print-text-gold {
+    color: #b8860b !important; /* ذهبي داكن للطباعة */
+  }
+}
