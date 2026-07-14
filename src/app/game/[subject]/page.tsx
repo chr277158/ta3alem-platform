@@ -4,7 +4,7 @@ import { useEffect, useState, use, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import CelebrationModal from '@/components/CelebrationModal';
 import { playSound } from '@/lib/sounds';
-
+import Companion3D from '@/components/Companion3D';
 interface Question {
   id: string;
   question: string;
@@ -18,7 +18,8 @@ export default function GamePage({ params }: { params: Promise<{ subject: string
   const searchParams = useSearchParams();
   const { subject } = use(params);
   const level = parseInt(searchParams.get('level') || '1');
-  
+  const [companionMood, setCompanionMood] = useState<'happy' | 'neutral' | 'sad'>('neutral');
+const [userAvatar, setUserAvatar] = useState('robot');
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
@@ -35,6 +36,22 @@ export default function GamePage({ params }: { params: Promise<{ subject: string
   // ✅ استخدام useRef لتتبع القيم الحالية
   const scoreRef = useRef(0);
   const heartsRef = useRef(3);
+
+  useEffect(() => {
+  const fetchUserData = async () => {
+    const userId = localStorage.getItem('userId');
+    const storedAvatar = localStorage.getItem('userAvatar');
+    if (storedAvatar) setUserAvatar(storedAvatar);
+    
+    if (userId) {
+      try {
+        const res = await fetch(`/api/user/data?userId=${userId}`); // (تحتاج لإنشاء هذا الـ API البسيط أو تعديله)
+        // أو ببساطة استخدم localStorage إذا حفظته عند التسجيل
+      } catch (e) {}
+    }
+  };
+  fetchUserData();
+}, []);
 
   useEffect(() => {
     loadQuestions();
@@ -83,26 +100,35 @@ export default function GamePage({ params }: { params: Promise<{ subject: string
     }
   };
 
-  const handleAnswer = async (answerIndex: number) => {
-    if (showExplanation) return;
+const handleAnswer = async (answerIndex: number) => {
+  if (showExplanation) return;
 
-    setSelectedAnswer(answerIndex);
-    setShowExplanation(true);
+  setSelectedAnswer(answerIndex);
+  setShowExplanation(true);
 
-    const isCorrect = answerIndex === questions[currentQuestion].correctAnswer;
+  const isCorrect = answerIndex === questions[currentQuestion].correctAnswer;
 
-    if (isCorrect) {
-      // ✅ تحديث ref أولاً
-      scoreRef.current += 1;
-      setScore(scoreRef.current);
-      console.log(`✅ Correct! Score: ${scoreRef.current}/5`);
-      playSound('correct');
+  if (isCorrect) {
+    setScore(score + 1);
+    setCompanionMood('happy'); // 😃 الشخصية تفرح
+    playSound('correct');
+  } else {
+    setHearts(hearts - 1);
+    setCompanionMood('sad'); // 😢 الشخصية تحزن
+    playSound('wrong');
+  }
+
+  setTimeout(() => {
+    setCompanionMood('neutral'); // 😐 العودة للوضع الطبيعي
+    if (currentQuestion < questions.length - 1 && hearts > 0) {
+      setCurrentQuestion(currentQuestion + 1);
+      setShowExplanation(false);
+      setSelectedAnswer(null);
     } else {
-      heartsRef.current -= 1;
-      setHearts(heartsRef.current);
-      console.log(`❌ Wrong! Hearts: ${heartsRef.current}`);
-      playSound('wrong');
+      finishGame();
     }
+  }, 3000);
+};
 
     // الانتقال للسؤال التالي بعد 3 ثواني
     setTimeout(() => {
@@ -247,6 +273,10 @@ export default function GamePage({ params }: { params: Promise<{ subject: string
                 </span>
               ))}
             </div>
+            // داخل الـ return، في أعلى الصفحة:
+<div className="absolute top-4 left-4 z-20">
+  <Companion3D avatarType={userAvatar} mood={companionMood} />
+</div>
             <div className="text-2xl font-bold text-blue-600">
               {scoreRef.current}/{questions.length}
             </div>

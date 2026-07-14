@@ -12,6 +12,7 @@ model User {
   username      String   @unique
   email         String?  @unique
   password      String
+  avatar        String   @default("robot")
   playerLevel   Int      @default(1)
   totalPoints   Int      @default(0)
   streakDays    Int      @default(0)
@@ -23,6 +24,7 @@ model User {
   badges            UserBadge[]
   subjectProgress   SubjectProgress[]
 }
+
 
 model SubjectProgress {
   id         String  @id @default(cuid())
@@ -48,6 +50,7 @@ model Question {
   explanation   String?
   createdAt     DateTime @default(now())
 }
+
 
 model GameResult {
   id              String   @id @default(cuid())
