@@ -1,7 +1,7 @@
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Environment, ContactShadows } from '@react-three/drei';
 import { Suspense } from 'react';
-import Walker from './components/Walker';
+import Walker from './components/Walker.jsx';
 
 export default function App() {
   return (
@@ -11,8 +11,7 @@ export default function App() {
         camera={{ position: [0, 1.5, 4], fov: 50 }}
       >
         <Suspense fallback={null}>
-          {/* الإضاءة */}
-          <ambientLight intensity={0.5} />
+          <ambientLight intensity={0.6} />
           <directionalLight
             position={[5, 5, 5]}
             intensity={1}
@@ -20,10 +19,8 @@ export default function App() {
             shadow-mapSize={[1024, 1024]}
           />
 
-          {/* النموذج */}
           <Walker position={[0, 0, 0]} scale={1} />
 
-          {/* الظل تحت الشخصية */}
           <ContactShadows
             position={[0, -0.01, 0]}
             opacity={0.5}
@@ -31,10 +28,8 @@ export default function App() {
             blur={2}
           />
 
-          {/* بيئة إضاءة */}
           <Environment preset="sunset" />
 
-          {/* التحكم بالكاميرا بالفأرة */}
           <OrbitControls
             enablePan={false}
             minDistance={2}
