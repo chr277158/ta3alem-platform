@@ -1,0 +1,2060 @@
+PS C:\projects\ta3alem-platform> tree
+Structure du dossier
+Le numéro de série du volume est 000000C8 AA2F:8348
+C:.
+├───.next
+│   ├───build
+│   │   └───chunks
+│   ├───cache
+│   ├───dev
+│   │   ├───build
+│   │   │   └───chunks
+│   │   ├───cache
+│   │   │   └───turbopack
+│   │   │       └───v16.2.10
+│   │   ├───logs
+│   │   ├───node_modules
+│   │   │   └───@prisma
+│   │   │       └───client-2c3a283f134fdcb6
+│   │   │           ├───generator-build
+│   │   │           ├───runtime
+│   │   │           └───scripts
+│   │   ├───server
+│   │   │   ├───app
+│   │   │   │   ├───api
+│   │   │   │   │   └───auth
+│   │   │   │   │       ├───login
+│   │   │   │   │       │   └───route
+│   │   │   │   │       └───register
+│   │   │   │   │           └───route
+│   │   │   │   ├───dashboard
+│   │   │   │   │   └───page
+│   │   │   │   ├───login
+│   │   │   │   │   └───page
+│   │   │   │   ├───page
+│   │   │   │   └───register
+│   │   │   │       └───page
+│   │   │   ├───chunks
+│   │   │   │   └───ssr
+│   │   │   └───pages
+│   │   │       ├───_app
+│   │   │       ├───_document
+│   │   │       └───_error
+│   │   ├───static
+│   │   │   ├───chunks
+│   │   │   │   └───pages
+│   │   │   ├───development
+│   │   │   └───media
+│   │   └───types
+│   ├───diagnostics
+│   ├───node_modules
+│   │   └───@prisma
+│   │       └───client-2c3a283f134fdcb6
+│   │           ├───generator-build
+│   │           ├───runtime
+│   │           └───scripts
+│   ├───server
+│   │   ├───app
+│   │   │   ├───api
+│   │   │   │   ├───auth
+│   │   │   │   │   ├───login
+│   │   │   │   │   │   └───route
+│   │   │   │   │   └───register
+│   │   │   │   │       └───route
+│   │   │   │   ├───badges
+│   │   │   │   │   └───route
+│   │   │   │   ├───daily
+│   │   │   │   │   ├───finish
+│   │   │   │   │   │   └───route
+│   │   │   │   │   └───route
+│   │   │   │   ├───game
+│   │   │   │   │   ├───finish
+│   │   │   │   │   │   └───route
+│   │   │   │   │   └───questions
+│   │   │   │   │       └───route
+│   │   │   │   ├───mastery
+│   │   │   │   │   └───progress
+│   │   │   │   │       └───route
+│   │   │   │   ├───register
+│   │   │   │   │   └───page
+│   │   │   │   └───register.segments
+│   │   │   │       └───api
+│   │   │   │           └───register
+│   │   │   ├───badges
+│   │   │   │   └───page
+│   │   │   ├───badges.segments
+│   │   │   │   └───badges
+│   │   │   ├───daily
+│   │   │   │   └───page
+│   │   │   ├───daily.segments
+│   │   │   │   └───daily
+│   │   │   ├───dashboard
+│   │   │   │   └───page
+│   │   │   ├───dashboard.segments
+│   │   │   │   └───dashboard
+│   │   │   ├───favicon.ico
+│   │   │   │   └───route
+│   │   │   ├───game
+│   │   │   │   └───[subject]
+│   │   │   │       └───page
+│   │   │   ├───games
+│   │   │   │   ├───memory
+│   │   │   │   │   └───page
+│   │   │   │   ├───memory.segments
+│   │   │   │   │   └───games
+│   │   │   │   │       └───memory
+│   │   │   │   ├───page
+│   │   │   │   ├───snake
+│   │   │   │   │   └───page
+│   │   │   │   └───snake.segments
+│   │   │   │       └───games
+│   │   │   │           └───snake
+│   │   │   ├───games.segments
+│   │   │   │   └───games
+│   │   │   ├───index.segments
+│   │   │   ├───login
+│   │   │   │   └───page
+│   │   │   ├───login.segments
+│   │   │   │   └───login
+│   │   │   ├───mastery
+│   │   │   │   └───page
+│   │   │   ├───mastery.segments
+│   │   │   │   └───mastery
+│   │   │   ├───page
+│   │   │   ├───register
+│   │   │   │   └───page
+│   │   │   ├───register.segments
+│   │   │   │   └───register
+│   │   │   ├───_global-error
+│   │   │   │   └───page
+│   │   │   ├───_global-error.segments
+│   │   │   ├───_not-found
+│   │   │   │   └───page
+│   │   │   └───_not-found.segments
+│   │   │       └───_not-found
+│   │   ├───chunks
+│   │   │   └───ssr
+│   │   └───pages
+│   ├───static
+│   │   ├───BFKOXGI1Xw8p6wlDHKvCV
+│   │   ├───chunks
+│   │   └───media
+│   └───types
+├───node_modules
+│   ├───.bin
+│   ├───.cache
+│   │   └───prisma
+│   │       └───master
+│   │           └───605197351a3c8bdd595af2d2a9bc3025bca48ea2
+│   │               └───windows
+│   ├───.prisma
+│   │   └───client
+│   │       └───deno
+│   ├───@alloc
+│   │   └───quick-lru
+│   ├───@babel
+│   │   └───runtime
+│   │       ├───helpers
+│   │       │   └───esm
+│   │       └───regenerator
+│   ├───@dimforge
+│   │   └───rapier3d-compat
+│   │       ├───control
+│   │       ├───dynamics
+│   │       ├───geometry
+│   │       └───pipeline
+│   ├───@img
+│   │   ├───colour
+│   │   └───sharp-win32-x64
+│   │       └───lib
+│   ├───@jridgewell
+│   │   ├───gen-mapping
+│   │   │   ├───dist
+│   │   │   │   └───types
+│   │   │   ├───src
+│   │   │   └───types
+│   │   ├───resolve-uri
+│   │   │   └───dist
+│   │   │       └───types
+│   │   ├───sourcemap-codec
+│   │   │   ├───dist
+│   │   │   ├───src
+│   │   │   └───types
+│   │   └───trace-mapping
+│   │       ├───dist
+│   │       ├───src
+│   │       └───types
+│   ├───@mediapipe
+│   │   └───tasks-vision
+│   │       └───wasm
+│   ├───@monogrid
+│   │   └───gainmap-js
+│   │       └───dist
+│   │           ├───core
+│   │           ├───decode
+│   │           │   ├───shared
+│   │           │   │   ├───errors
+│   │           │   │   └───utils
+│   │           │   ├───webgl
+│   │           │   │   ├───loaders
+│   │           │   │   └───materials
+│   │           │   └───webgpu
+│   │           │       ├───core
+│   │           │       ├───loaders
+│   │           │       └───materials
+│   │           ├───encode
+│   │           │   └───materials
+│   │           └───libultrahdr
+│   ├───@next
+│   │   ├───env
+│   │   │   └───dist
+│   │   └───swc-win32-x64-msvc
+│   ├───@nodelib
+│   │   ├───fs.scandir
+│   │   │   └───out
+│   │   │       ├───adapters
+│   │   │       ├───providers
+│   │   │       ├───types
+│   │   │       └───utils
+│   │   ├───fs.stat
+│   │   │   └───out
+│   │   │       ├───adapters
+│   │   │       ├───providers
+│   │   │       └───types
+│   │   └───fs.walk
+│   │       └───out
+│   │           ├───providers
+│   │           ├───readers
+│   │           └───types
+│   ├───@prisma
+│   │   ├───client
+│   │   │   ├───generator-build
+│   │   │   ├───runtime
+│   │   │   └───scripts
+│   │   ├───debug
+│   │   │   └───dist
+│   │   ├───engines
+│   │   │   ├───dist
+│   │   │   │   └───scripts
+│   │   │   ├───node_modules
+│   │   │   │   └───.cache
+│   │   │   │       └───prisma
+│   │   │   │           └───master
+│   │   │   │               └───605197351a3c8bdd595af2d2a9bc3025bca48ea2
+│   │   │   │                   └───windows
+│   │   │   └───scripts
+│   │   ├───engines-version
+│   │   ├───fetch-engine
+│   │   │   └───dist
+│   │   └───get-platform
+│   │       └───dist
+│   │           └───test-utils
+│   ├───@react-three
+│   │   ├───drei
+│   │   │   ├───core
+│   │   │   ├───helpers
+│   │   │   │   └───glsl
+│   │   │   ├───materials
+│   │   │   ├───native
+│   │   │   └───web
+│   │   │       └───pivotControls
+│   │   └───fiber
+│   │       ├───dist
+│   │       │   └───declarations
+│   │       │       ├───react-reconciler
+│   │       │       └───src
+│   │       │           ├───core
+│   │       │           ├───native
+│   │       │           └───web
+│   │       ├───native
+│   │       │   └───dist
+│   │       └───react-reconciler
+│   ├───@swc
+│   │   └───helpers
+│   │       ├───cjs
+│   │       ├───esm
+│   │       ├───scripts
+│   │       ├───src
+│   │       └───_
+│   │           ├───index
+│   │           ├───_apply_decorated_descriptor
+│   │           ├───_apply_decs_2203_r
+│   │           ├───_array_like_to_array
+│   │           ├───_array_without_holes
+│   │           ├───_array_with_holes
+│   │           ├───_assert_this_initialized
+│   │           ├───_async_generator
+│   │           ├───_async_generator_delegate
+│   │           ├───_async_iterator
+│   │           ├───_async_to_generator
+│   │           ├───_await_async_generator
+│   │           ├───_await_value
+│   │           ├───_call_super
+│   │           ├───_check_private_redeclaration
+│   │           ├───_class_apply_descriptor_destructure
+│   │           ├───_class_apply_descriptor_get
+│   │           ├───_class_apply_descriptor_set
+│   │           ├───_class_apply_descriptor_update
+│   │           ├───_class_call_check
+│   │           ├───_class_check_private_static_access
+│   │           ├───_class_check_private_static_field_descriptor
+│   │           ├───_class_extract_field_descriptor
+│   │           ├───_class_name_tdz_error
+│   │           ├───_class_private_field_destructure
+│   │           ├───_class_private_field_get
+│   │           ├───_class_private_field_init
+│   │           ├───_class_private_field_loose_base
+│   │           ├───_class_private_field_loose_key
+│   │           ├───_class_private_field_set
+│   │           ├───_class_private_field_update
+│   │           ├───_class_private_method_get
+│   │           ├───_class_private_method_init
+│   │           ├───_class_private_method_set
+│   │           ├───_class_static_private_field_destructure
+│   │           ├───_class_static_private_field_spec_get
+│   │           ├───_class_static_private_field_spec_set
+│   │           ├───_class_static_private_field_update
+│   │           ├───_class_static_private_method_get
+│   │           ├───_construct
+│   │           ├───_create_class
+│   │           ├───_create_for_of_iterator_helper_loose
+│   │           ├───_create_super
+│   │           ├───_decorate
+│   │           ├───_defaults
+│   │           ├───_define_enumerable_properties
+│   │           ├───_define_property
+│   │           ├───_dispose
+│   │           ├───_export_star
+│   │           ├───_extends
+│   │           ├───_get
+│   │           ├───_get_prototype_of
+│   │           ├───_identity
+│   │           ├───_inherits
+│   │           ├───_inherits_loose
+│   │           ├───_initializer_define_property
+│   │           ├───_initializer_warning_helper
+│   │           ├───_instanceof
+│   │           ├───_interop_require_default
+│   │           ├───_interop_require_wildcard
+│   │           ├───_is_native_function
+│   │           ├───_is_native_reflect_construct
+│   │           ├───_iterable_to_array
+│   │           ├───_iterable_to_array_limit
+│   │           ├───_iterable_to_array_limit_loose
+│   │           ├───_jsx
+│   │           ├───_new_arrow_check
+│   │           ├───_non_iterable_rest
+│   │           ├───_non_iterable_spread
+│   │           ├───_object_destructuring_empty
+│   │           ├───_object_spread
+│   │           ├───_object_spread_props
+│   │           ├───_object_without_properties
+│   │           ├───_object_without_properties_loose
+│   │           ├───_possible_constructor_return
+│   │           ├───_read_only_error
+│   │           ├───_set
+│   │           ├───_set_prototype_of
+│   │           ├───_skip_first_generator_next
+│   │           ├───_sliced_to_array
+│   │           ├───_sliced_to_array_loose
+│   │           ├───_super_prop_base
+│   │           ├───_tagged_template_literal
+│   │           ├───_tagged_template_literal_loose
+│   │           ├───_throw
+│   │           ├───_to_array
+│   │           ├───_to_consumable_array
+│   │           ├───_to_primitive
+│   │           ├───_to_property_key
+│   │           ├───_ts_add_disposable_resource
+│   │           ├───_ts_decorate
+│   │           ├───_ts_dispose_resources
+│   │           ├───_ts_generator
+│   │           ├───_ts_metadata
+│   │           ├───_ts_param
+│   │           ├───_ts_values
+│   │           ├───_type_of
+│   │           ├───_unsupported_iterable_to_array
+│   │           ├───_update
+│   │           ├───_using
+│   │           ├───_using_ctx
+│   │           ├───_wrap_async_generator
+│   │           ├───_wrap_native_super
+│   │           └───_write_only_error
+│   ├───@tweenjs
+│   │   └───tween.js
+│   │       └───dist
+│   ├───@types
+│   │   ├───bcryptjs
+│   │   ├───draco3d
+│   │   ├───node
+│   │   │   ├───assert
+│   │   │   ├───compatibility
+│   │   │   ├───dns
+│   │   │   ├───fs
+│   │   │   ├───readline
+│   │   │   ├───stream
+│   │   │   ├───timers
+│   │   │   ├───ts5.6
+│   │   │   └───web-globals
+│   │   ├───offscreencanvas
+│   │   ├───react
+│   │   │   └───ts5.0
+│   │   ├───react-dom
+│   │   │   └───test-utils
+│   │   ├───react-reconciler
+│   │   ├───stats.js
+│   │   ├───three
+│   │   │   ├───build
+│   │   │   ├───examples
+│   │   │   │   └───jsm
+│   │   │   │       ├───animation
+│   │   │   │       ├───capabilities
+│   │   │   │       ├───controls
+│   │   │   │       ├───csm
+│   │   │   │       ├───curves
+│   │   │   │       ├───effects
+│   │   │   │       ├───environments
+│   │   │   │       ├───exporters
+│   │   │   │       ├───generators
+│   │   │   │       │   └───city
+│   │   │   │       ├───geometries
+│   │   │   │       ├───gpgpu
+│   │   │   │       ├───helpers
+│   │   │   │       ├───inspector
+│   │   │   │       │   ├───extensions
+│   │   │   │       │   │   └───tsl-graph
+│   │   │   │       │   ├───tabs
+│   │   │   │       │   └───ui
+│   │   │   │       ├───interaction
+│   │   │   │       ├───interactive
+│   │   │   │       ├───libs
+│   │   │   │       ├───lighting
+│   │   │   │       ├───lights
+│   │   │   │       ├───lines
+│   │   │   │       │   └───webgpu
+│   │   │   │       ├───loaders
+│   │   │   │       ├───materials
+│   │   │   │       ├───math
+│   │   │   │       ├───misc
+│   │   │   │       ├───modifiers
+│   │   │   │       ├───objects
+│   │   │   │       ├───physics
+│   │   │   │       ├───postprocessing
+│   │   │   │       ├───renderers
+│   │   │   │       ├───shaders
+│   │   │   │       ├───textures
+│   │   │   │       ├───transpiler
+│   │   │   │       ├───tsl
+│   │   │   │       │   ├───display
+│   │   │   │       │   ├───lighting
+│   │   │   │       │   │   └───data
+│   │   │   │       │   ├───math
+│   │   │   │       │   ├───shadows
+│   │   │   │       │   └───utils
+│   │   │   │       ├───utils
+│   │   │   │       └───webxr
+│   │   │   └───src
+│   │   │       ├───animation
+│   │   │       │   └───tracks
+│   │   │       ├───audio
+│   │   │       ├───cameras
+│   │   │       ├───core
+│   │   │       ├───extras
+│   │   │       │   ├───core
+│   │   │       │   └───curves
+│   │   │       ├───geometries
+│   │   │       ├───helpers
+│   │   │       ├───lights
+│   │   │       │   └───webgpu
+│   │   │       ├───loaders
+│   │   │       │   └───nodes
+│   │   │       ├───materials
+│   │   │       │   └───nodes
+│   │   │       │       └───manager
+│   │   │       ├───math
+│   │   │       │   └───interpolants
+│   │   │       ├───nodes
+│   │   │       │   ├───accessors
+│   │   │       │   ├───code
+│   │   │       │   ├───core
+│   │   │       │   ├───display
+│   │   │       │   ├───fog
+│   │   │       │   ├───functions
+│   │   │       │   │   ├───BSDF
+│   │   │       │   │   └───material
+│   │   │       │   ├───geometry
+│   │   │       │   ├───gpgpu
+│   │   │       │   ├───lighting
+│   │   │       │   ├───materialx
+│   │   │       │   │   └───lib
+│   │   │       │   ├───math
+│   │   │       │   ├───parsers
+│   │   │       │   ├───pmrem
+│   │   │       │   ├───procedural
+│   │   │       │   ├───shapes
+│   │   │       │   ├───tsl
+│   │   │       │   └───utils
+│   │   │       ├───objects
+│   │   │       ├───renderers
+│   │   │       │   ├───common
+│   │   │       │   │   ├───extras
+│   │   │       │   │   └───nodes
+│   │   │       │   ├───shaders
+│   │   │       │   ├───webgl
+│   │   │       │   ├───webgl-fallback
+│   │   │       │   │   ├───nodes
+│   │   │       │   │   └───utils
+│   │   │       │   ├───webgpu
+│   │   │       │   │   ├───nodes
+│   │   │       │   │   └───utils
+│   │   │       │   └───webxr
+│   │   │       ├───scenes
+│   │   │       └───textures
+│   │   └───webxr
+│   ├───@use-gesture
+│   │   ├───core
+│   │   │   ├───actions
+│   │   │   │   └───dist
+│   │   │   ├───dist
+│   │   │   │   └───declarations
+│   │   │   │       └───src
+│   │   │   │           ├───config
+│   │   │   │           ├───engines
+│   │   │   │           ├───types
+│   │   │   │           └───utils
+│   │   │   ├───src
+│   │   │   │   ├───config
+│   │   │   │   ├───engines
+│   │   │   │   ├───types
+│   │   │   │   └───utils
+│   │   │   ├───types
+│   │   │   │   └───dist
+│   │   │   └───utils
+│   │   │       └───dist
+│   │   └───react
+│   │       ├───dist
+│   │       │   └───declarations
+│   │       │       └───src
+│   │       └───src
+│   ├───any-promise
+│   │   └───register
+│   ├───anymatch
+│   ├───arg
+│   ├───autoprefixer
+│   │   ├───bin
+│   │   ├───data
+│   │   └───lib
+│   │       └───hacks
+│   ├───base64-js
+│   ├───baseline-browser-mapping
+│   │   └───dist
+│   ├───bcryptjs
+│   │   ├───.vscode
+│   │   ├───bin
+│   │   ├───dist
+│   │   ├───externs
+│   │   ├───scripts
+│   │   ├───src
+│   │   │   └───bcrypt
+│   │   │       ├───prng
+│   │   │       └───util
+│   │   └───tests
+│   ├───bidi-js
+│   │   ├───dist
+│   │   └───src
+│   │       ├───data
+│   │       └───util
+│   ├───binary-extensions
+│   ├───braces
+│   │   └───lib
+│   ├───browserslist
+│   ├───buffer
+│   ├───camelcase-css
+│   ├───camera-controls
+│   │   └───dist
+│   ├───caniuse-lite
+│   │   ├───data
+│   │   │   ├───features
+│   │   │   └───regions
+│   │   └───dist
+│   │       ├───lib
+│   │       └───unpacker
+│   ├───chokidar
+│   │   ├───lib
+│   │   ├───node_modules
+│   │   │   └───glob-parent
+│   │   └───types
+│   ├───client-only
+│   ├───commander
+│   │   └───typings
+│   ├───cross-env
+│   │   └───src
+│   │       └───bin
+│   ├───cross-spawn
+│   │   └───lib
+│   │       └───util
+│   ├───cssesc
+│   │   ├───bin
+│   │   └───man
+│   ├───csstype
+│   ├───detect-gpu
+│   │   └───dist
+│   │       ├───benchmarks
+│   │       ├───example
+│   │       ├───rollup
+│   │       └───src
+│   │           └───internal
+│   ├───detect-libc
+│   │   └───lib
+│   ├───didyoumean
+│   ├───dlv
+│   │   └───dist
+│   ├───draco3d
+│   ├───electron-to-chromium
+│   ├───es-errors
+│   │   ├───.github
+│   │   └───test
+│   ├───escalade
+│   │   ├───dist
+│   │   └───sync
+│   ├───fast-glob
+│   │   ├───node_modules
+│   │   │   └───glob-parent
+│   │   └───out
+│   │       ├───managers
+│   │       ├───providers
+│   │       │   ├───filters
+│   │       │   ├───matchers
+│   │       │   └───transformers
+│   │       ├───readers
+│   │       ├───types
+│   │       └───utils
+│   ├───fastq
+│   │   └───test
+│   ├───fflate
+│   │   ├───esm
+│   │   ├───lib
+│   │   └───umd
+│   ├───fill-range
+│   ├───fraction.js
+│   │   ├───dist
+│   │   ├───examples
+│   │   ├───src
+│   │   └───tests
+│   ├───function-bind
+│   │   ├───.github
+│   │   └───test
+│   ├───glob-parent
+│   ├───glsl-noise
+│   │   ├───classic
+│   │   ├───periodic
+│   │   └───simplex
+│   ├───hasown
+│   │   └───.github
+│   ├───hls.js
+│   │   ├───dist
+│   │   └───src
+│   │       ├───controller
+│   │       ├───crypt
+│   │       ├───demux
+│   │       │   ├───audio
+│   │       │   └───video
+│   │       ├───loader
+│   │       ├───polyfills
+│   │       ├───remux
+│   │       ├───types
+│   │       └───utils
+│   ├───ieee754
+│   ├───immediate
+│   │   ├───dist
+│   │   └───lib
+│   ├───is-binary-path
+│   ├───is-core-module
+│   │   └───test
+│   ├───is-extglob
+│   ├───is-glob
+│   ├───is-number
+│   ├───is-promise
+│   ├───isexe
+│   │   └───test
+│   ├───its-fine
+│   │   └───dist
+│   ├───jiti
+│   │   ├───bin
+│   │   ├───dist
+│   │   │   └───plugins
+│   │   └───lib
+│   ├───lie
+│   │   ├───dist
+│   │   └───lib
+│   ├───lilconfig
+│   │   └───src
+│   ├───lines-and-columns
+│   │   └───build
+│   ├───maath
+│   │   ├───buffer
+│   │   │   └───dist
+│   │   ├───dist
+│   │   │   └───declarations
+│   │   │       └───src
+│   │   │           └───random
+│   │   ├───easing
+│   │   │   └───dist
+│   │   ├───geometry
+│   │   │   └───dist
+│   │   ├───matrix
+│   │   │   └───dist
+│   │   ├───misc
+│   │   │   └───dist
+│   │   ├───random
+│   │   │   └───dist
+│   │   ├───three
+│   │   │   └───dist
+│   │   ├───triangle
+│   │   │   └───dist
+│   │   ├───vector2
+│   │   │   └───dist
+│   │   └───vector3
+│   │       └───dist
+│   ├───merge2
+│   ├───meshline
+│   │   └───dist
+│   ├───meshoptimizer
+│   ├───micromatch
+│   ├───mz
+│   ├───nanoid
+│   │   ├───async
+│   │   ├───bin
+│   │   ├───non-secure
+│   │   └───url-alphabet
+│   ├───next
+│   │   ├───compat
+│   │   ├───dist
+│   │   │   ├───api
+│   │   │   ├───bin
+│   │   │   ├───build
+│   │   │   │   ├───adapter
+│   │   │   │   ├───analysis
+│   │   │   │   ├───analyze
+│   │   │   │   ├───babel
+│   │   │   │   │   ├───loader
+│   │   │   │   │   └───plugins
+│   │   │   │   ├───jest
+│   │   │   │   │   └───__mocks__
+│   │   │   │   ├───manifests
+│   │   │   │   │   └───formatter
+│   │   │   │   ├───next-config-ts
+│   │   │   │   ├───output
+│   │   │   │   ├───polyfills
+│   │   │   │   │   ├───fetch
+│   │   │   │   │   └───object.assign
+│   │   │   │   ├───segment-config
+│   │   │   │   │   ├───app
+│   │   │   │   │   ├───middleware
+│   │   │   │   │   └───pages
+│   │   │   │   ├───static-paths
+│   │   │   │   │   └───app
+│   │   │   │   ├───swc
+│   │   │   │   ├───templates
+│   │   │   │   ├───turbopack-analyze
+│   │   │   │   ├───turbopack-build
+│   │   │   │   ├───turborepo-access-trace
+│   │   │   │   ├───webpack
+│   │   │   │   │   ├───alias
+│   │   │   │   │   ├───config
+│   │   │   │   │   │   └───blocks
+│   │   │   │   │   │       ├───css
+│   │   │   │   │   │       │   └───loaders
+│   │   │   │   │   │       └───images
+│   │   │   │   │   ├───loaders
+│   │   │   │   │   │   ├───css-loader
+│   │   │   │   │   │   │   └───src
+│   │   │   │   │   │   │       ├───plugins
+│   │   │   │   │   │   │       └───runtime
+│   │   │   │   │   │   ├───devtool
+│   │   │   │   │   │   ├───lightningcss-loader
+│   │   │   │   │   │   │   └───src
+│   │   │   │   │   │   ├───metadata
+│   │   │   │   │   │   ├───next-app-loader
+│   │   │   │   │   │   ├───next-edge-app-route-loader
+│   │   │   │   │   │   ├───next-edge-ssr-loader
+│   │   │   │   │   │   ├───next-flight-loader
+│   │   │   │   │   │   ├───next-font-loader
+│   │   │   │   │   │   ├───next-image-loader
+│   │   │   │   │   │   ├───next-route-loader
+│   │   │   │   │   │   ├───next-style-loader
+│   │   │   │   │   │   │   └───runtime
+│   │   │   │   │   │   ├───postcss-loader
+│   │   │   │   │   │   │   └───src
+│   │   │   │   │   │   └───resolve-url-loader
+│   │   │   │   │   │       └───lib
+│   │   │   │   │   └───plugins
+│   │   │   │   │       ├───minify-webpack-plugin
+│   │   │   │   │       │   └───src
+│   │   │   │   │       ├───next-types-plugin
+│   │   │   │   │       ├───telemetry-plugin
+│   │   │   │   │       └───wellknown-errors-plugin
+│   │   │   │   ├───webpack-build
+│   │   │   │   └───webpack-config-rules
+│   │   │   ├───bundle-analyzer
+│   │   │   │   ├───_next
+│   │   │   │   │   └───static
+│   │   │   │   │       ├───-wnBUGOTjuvnrsp1fJxyv
+│   │   │   │   │       └───chunks
+│   │   │   │   └───_not-found
+│   │   │   ├───cli
+│   │   │   │   └───internal
+│   │   │   ├───client
+│   │   │   │   ├───app-dir
+│   │   │   │   ├───compat
+│   │   │   │   ├───components
+│   │   │   │   │   ├───builtin
+│   │   │   │   │   ├───errors
+│   │   │   │   │   ├───http-access-fallback
+│   │   │   │   │   ├───instant-validation
+│   │   │   │   │   ├───router-reducer
+│   │   │   │   │   │   └───reducers
+│   │   │   │   │   ├───segment-cache
+│   │   │   │   │   └───styles
+│   │   │   │   ├───dev
+│   │   │   │   │   ├───error-overlay
+│   │   │   │   │   └───hot-reloader
+│   │   │   │   │       ├───app
+│   │   │   │   │       └───pages
+│   │   │   │   ├───legacy
+│   │   │   │   ├───lib
+│   │   │   │   ├───portal
+│   │   │   │   ├───react-client-callbacks
+│   │   │   │   ├───request
+│   │   │   │   └───tracing
+│   │   │   ├───compiled
+│   │   │   │   ├───@babel
+│   │   │   │   │   └───runtime
+│   │   │   │   │       ├───helpers
+│   │   │   │   │       │   └───esm
+│   │   │   │   │       └───regenerator
+│   │   │   │   ├───@edge-runtime
+│   │   │   │   │   ├───cookies
+│   │   │   │   │   ├───ponyfill
+│   │   │   │   │   └───primitives
+│   │   │   │   ├───@hapi
+│   │   │   │   │   └───accept
+│   │   │   │   ├───@modelcontextprotocol
+│   │   │   │   │   └───sdk
+│   │   │   │   │       └───server
+│   │   │   │   ├───@mswjs
+│   │   │   │   │   └───interceptors
+│   │   │   │   │       └───ClientRequest
+│   │   │   │   ├───@napi-rs
+│   │   │   │   │   └───triples
+│   │   │   │   ├───@next
+│   │   │   │   │   ├───font
+│   │   │   │   │   │   ├───dist
+│   │   │   │   │   │   │   ├───fontkit
+│   │   │   │   │   │   │   ├───google
+│   │   │   │   │   │   │   └───local
+│   │   │   │   │   │   ├───google
+│   │   │   │   │   │   └───local
+│   │   │   │   │   └───react-refresh-utils
+│   │   │   │   │       └───dist
+│   │   │   │   │           └───internal
+│   │   │   │   ├───@opentelemetry
+│   │   │   │   │   └───api
+│   │   │   │   ├───@vercel
+│   │   │   │   │   ├───nft
+│   │   │   │   │   ├───og
+│   │   │   │   │   │   └───satori
+│   │   │   │   │   └───routing-utils
+│   │   │   │   ├───acorn
+│   │   │   │   ├───anser
+│   │   │   │   ├───assert
+│   │   │   │   ├───async-retry
+│   │   │   │   ├───async-sema
+│   │   │   │   ├───babel
+│   │   │   │   ├───babel-packages
+│   │   │   │   ├───browserify-zlib
+│   │   │   │   ├───browserslist
+│   │   │   │   ├───buffer
+│   │   │   │   ├───busboy
+│   │   │   │   ├───bytes
+│   │   │   │   ├───ci-info
+│   │   │   │   ├───cli-select
+│   │   │   │   ├───client-only
+│   │   │   │   ├───commander
+│   │   │   │   ├───comment-json
+│   │   │   │   ├───compression
+│   │   │   │   ├───conf
+│   │   │   │   ├───constants-browserify
+│   │   │   │   ├───content-disposition
+│   │   │   │   ├───content-type
+│   │   │   │   ├───cookie
+│   │   │   │   ├───cross-spawn
+│   │   │   │   ├───crypto-browserify
+│   │   │   │   ├───css.escape
+│   │   │   │   ├───cssnano-simple
+│   │   │   │   ├───data-uri-to-buffer
+│   │   │   │   ├───debug
+│   │   │   │   ├───devalue
+│   │   │   │   ├───domain-browser
+│   │   │   │   ├───edge-runtime
+│   │   │   │   ├───events
+│   │   │   │   ├───find-up
+│   │   │   │   ├───fresh
+│   │   │   │   ├───glob
+│   │   │   │   ├───gzip-size
+│   │   │   │   ├───http-proxy
+│   │   │   │   ├───http-proxy-agent
+│   │   │   │   ├───https-browserify
+│   │   │   │   ├───https-proxy-agent
+│   │   │   │   ├───icss-utils
+│   │   │   │   ├───ignore-loader
+│   │   │   │   ├───image-detector
+│   │   │   │   ├───image-size
+│   │   │   │   ├───ipaddr.js
+│   │   │   │   ├───is-animated
+│   │   │   │   ├───is-docker
+│   │   │   │   ├───is-wsl
+│   │   │   │   ├───jest-worker
+│   │   │   │   ├───json5
+│   │   │   │   ├───jsonwebtoken
+│   │   │   │   ├───loader-runner
+│   │   │   │   ├───loader-utils2
+│   │   │   │   ├───loader-utils3
+│   │   │   │   ├───lodash.curry
+│   │   │   │   ├───lru-cache
+│   │   │   │   ├───mini-css-extract-plugin
+│   │   │   │   │   └───hmr
+│   │   │   │   ├───nanoid
+│   │   │   │   ├───native-url
+│   │   │   │   ├───neo-async
+│   │   │   │   ├───next-devtools
+│   │   │   │   ├───next-server
+│   │   │   │   ├───node-html-parser
+│   │   │   │   ├───ora
+│   │   │   │   ├───os-browserify
+│   │   │   │   ├───p-limit
+│   │   │   │   ├───p-queue
+│   │   │   │   ├───path-browserify
+│   │   │   │   ├───path-to-regexp
+│   │   │   │   ├───picomatch
+│   │   │   │   ├───postcss-flexbugs-fixes
+│   │   │   │   ├───postcss-modules-extract-imports
+│   │   │   │   ├───postcss-modules-local-by-default
+│   │   │   │   ├───postcss-modules-scope
+│   │   │   │   ├───postcss-modules-values
+│   │   │   │   ├───postcss-plugin-stub-for-cssnano-simple
+│   │   │   │   ├───postcss-preset-env
+│   │   │   │   ├───postcss-safe-parser
+│   │   │   │   ├───postcss-scss
+│   │   │   │   ├───postcss-value-parser
+│   │   │   │   ├───process
+│   │   │   │   ├───punycode
+│   │   │   │   ├───querystring-es3
+│   │   │   │   ├───raw-body
+│   │   │   │   ├───react
+│   │   │   │   │   └───cjs
+│   │   │   │   ├───react-dom
+│   │   │   │   │   └───cjs
+│   │   │   │   ├───react-dom-experimental
+│   │   │   │   │   └───cjs
+│   │   │   │   ├───react-experimental
+│   │   │   │   │   └───cjs
+│   │   │   │   ├───react-is
+│   │   │   │   │   └───cjs
+│   │   │   │   ├───react-refresh
+│   │   │   │   │   └───cjs
+│   │   │   │   ├───react-server-dom-turbopack
+│   │   │   │   │   └───cjs
+│   │   │   │   ├───react-server-dom-turbopack-experimental
+│   │   │   │   │   └───cjs
+│   │   │   │   ├───react-server-dom-webpack
+│   │   │   │   │   └───cjs
+│   │   │   │   ├───react-server-dom-webpack-experimental
+│   │   │   │   │   └───cjs
+│   │   │   │   ├───regenerator-runtime
+│   │   │   │   ├───safe-stable-stringify
+│   │   │   │   ├───sass-loader
+│   │   │   │   ├───scheduler
+│   │   │   │   │   └───cjs
+│   │   │   │   ├───scheduler-experimental
+│   │   │   │   │   └───cjs
+│   │   │   │   ├───schema-utils2
+│   │   │   │   ├───schema-utils3
+│   │   │   │   ├───semver
+│   │   │   │   ├───send
+│   │   │   │   ├───serve-handler
+│   │   │   │   ├───server-only
+│   │   │   │   ├───setimmediate
+│   │   │   │   ├───shell-quote
+│   │   │   │   ├───source-map
+│   │   │   │   ├───source-map08
+│   │   │   │   ├───stacktrace-parser
+│   │   │   │   ├───stream-browserify
+│   │   │   │   ├───stream-http
+│   │   │   │   ├───string-hash
+│   │   │   │   ├───string_decoder
+│   │   │   │   ├───strip-ansi
+│   │   │   │   ├───superstruct
+│   │   │   │   ├───tar
+│   │   │   │   ├───terser
+│   │   │   │   ├───text-table
+│   │   │   │   ├───timers-browserify
+│   │   │   │   ├───tty-browserify
+│   │   │   │   ├───ua-parser-js
+│   │   │   │   ├───unistore
+│   │   │   │   ├───util
+│   │   │   │   ├───vm-browserify
+│   │   │   │   ├───watchpack
+│   │   │   │   ├───web-vitals
+│   │   │   │   ├───web-vitals-attribution
+│   │   │   │   ├───webpack
+│   │   │   │   ├───webpack-sources1
+│   │   │   │   ├───webpack-sources3
+│   │   │   │   ├───ws
+│   │   │   │   ├───zod
+│   │   │   │   └───zod-validation-error
+│   │   │   ├───diagnostics
+│   │   │   ├───docs
+│   │   │   │   ├───01-app
+│   │   │   │   │   ├───01-getting-started
+│   │   │   │   │   ├───02-guides
+│   │   │   │   │   │   ├───migrating
+│   │   │   │   │   │   ├───testing
+│   │   │   │   │   │   └───upgrading
+│   │   │   │   │   └───03-api-reference
+│   │   │   │   │       ├───01-directives
+│   │   │   │   │       ├───02-components
+│   │   │   │   │       ├───03-file-conventions
+│   │   │   │   │       │   ├───01-metadata
+│   │   │   │   │       │   └───02-route-segment-config
+│   │   │   │   │       ├───04-functions
+│   │   │   │   │       ├───05-config
+│   │   │   │   │       │   └───01-next-config-js
+│   │   │   │   │       ├───06-cli
+│   │   │   │   │       └───07-adapters
+│   │   │   │   ├───02-pages
+│   │   │   │   │   ├───01-getting-started
+│   │   │   │   │   ├───02-guides
+│   │   │   │   │   │   ├───migrating
+│   │   │   │   │   │   ├───testing
+│   │   │   │   │   │   └───upgrading
+│   │   │   │   │   ├───03-building-your-application
+│   │   │   │   │   │   ├───01-routing
+│   │   │   │   │   │   ├───02-rendering
+│   │   │   │   │   │   ├───03-data-fetching
+│   │   │   │   │   │   └───06-configuring
+│   │   │   │   │   └───04-api-reference
+│   │   │   │   │       ├───01-components
+│   │   │   │   │       ├───02-file-conventions
+│   │   │   │   │       ├───03-functions
+│   │   │   │   │       ├───04-config
+│   │   │   │   │       │   └───01-next-config-js
+│   │   │   │   │       ├───05-cli
+│   │   │   │   │       └───06-adapters
+│   │   │   │   ├───03-architecture
+│   │   │   │   └───04-community
+│   │   │   ├───esm
+│   │   │   │   ├───api
+│   │   │   │   ├───build
+│   │   │   │   │   ├───adapter
+│   │   │   │   │   ├───analysis
+│   │   │   │   │   ├───analyze
+│   │   │   │   │   ├───babel
+│   │   │   │   │   │   ├───loader
+│   │   │   │   │   │   └───plugins
+│   │   │   │   │   ├───manifests
+│   │   │   │   │   │   └───formatter
+│   │   │   │   │   ├───next-config-ts
+│   │   │   │   │   ├───output
+│   │   │   │   │   ├───polyfills
+│   │   │   │   │   │   ├───fetch
+│   │   │   │   │   │   └───object.assign
+│   │   │   │   │   ├───segment-config
+│   │   │   │   │   │   ├───app
+│   │   │   │   │   │   ├───middleware
+│   │   │   │   │   │   └───pages
+│   │   │   │   │   ├───static-paths
+│   │   │   │   │   │   └───app
+│   │   │   │   │   ├───swc
+│   │   │   │   │   ├───templates
+│   │   │   │   │   ├───turbopack-analyze
+│   │   │   │   │   ├───turbopack-build
+│   │   │   │   │   ├───turborepo-access-trace
+│   │   │   │   │   ├───webpack
+│   │   │   │   │   │   ├───alias
+│   │   │   │   │   │   ├───config
+│   │   │   │   │   │   │   └───blocks
+│   │   │   │   │   │   │       ├───css
+│   │   │   │   │   │   │       │   └───loaders
+│   │   │   │   │   │   │       └───images
+│   │   │   │   │   │   ├───loaders
+│   │   │   │   │   │   │   ├───css-loader
+│   │   │   │   │   │   │   │   └───src
+│   │   │   │   │   │   │   │       ├───plugins
+│   │   │   │   │   │   │   │       └───runtime
+│   │   │   │   │   │   │   ├───devtool
+│   │   │   │   │   │   │   ├───lightningcss-loader
+│   │   │   │   │   │   │   │   └───src
+│   │   │   │   │   │   │   ├───metadata
+│   │   │   │   │   │   │   ├───next-app-loader
+│   │   │   │   │   │   │   ├───next-edge-app-route-loader
+│   │   │   │   │   │   │   ├───next-edge-ssr-loader
+│   │   │   │   │   │   │   ├───next-flight-loader
+│   │   │   │   │   │   │   ├───next-font-loader
+│   │   │   │   │   │   │   ├───next-image-loader
+│   │   │   │   │   │   │   ├───next-route-loader
+│   │   │   │   │   │   │   ├───next-style-loader
+│   │   │   │   │   │   │   │   └───runtime
+│   │   │   │   │   │   │   ├───postcss-loader
+│   │   │   │   │   │   │   │   └───src
+│   │   │   │   │   │   │   └───resolve-url-loader
+│   │   │   │   │   │   │       └───lib
+│   │   │   │   │   │   └───plugins
+│   │   │   │   │   │       ├───minify-webpack-plugin
+│   │   │   │   │   │       │   └───src
+│   │   │   │   │   │       ├───next-types-plugin
+│   │   │   │   │   │       ├───telemetry-plugin
+│   │   │   │   │   │       └───wellknown-errors-plugin
+│   │   │   │   │   ├───webpack-build
+│   │   │   │   │   └───webpack-config-rules
+│   │   │   │   ├───client
+│   │   │   │   │   ├───app-dir
+│   │   │   │   │   ├───compat
+│   │   │   │   │   ├───components
+│   │   │   │   │   │   ├───builtin
+│   │   │   │   │   │   ├───errors
+│   │   │   │   │   │   ├───http-access-fallback
+│   │   │   │   │   │   ├───instant-validation
+│   │   │   │   │   │   ├───router-reducer
+│   │   │   │   │   │   │   └───reducers
+│   │   │   │   │   │   ├───segment-cache
+│   │   │   │   │   │   └───styles
+│   │   │   │   │   ├───dev
+│   │   │   │   │   │   ├───error-overlay
+│   │   │   │   │   │   └───hot-reloader
+│   │   │   │   │   │       ├───app
+│   │   │   │   │   │       └───pages
+│   │   │   │   │   ├───legacy
+│   │   │   │   │   ├───lib
+│   │   │   │   │   ├───portal
+│   │   │   │   │   ├───react-client-callbacks
+│   │   │   │   │   ├───request
+│   │   │   │   │   └───tracing
+│   │   │   │   ├───export
+│   │   │   │   │   ├───helpers
+│   │   │   │   │   └───routes
+│   │   │   │   ├───lib
+│   │   │   │   │   ├───framework
+│   │   │   │   │   ├───fs
+│   │   │   │   │   ├───helpers
+│   │   │   │   │   ├───memory
+│   │   │   │   │   ├───metadata
+│   │   │   │   │   │   ├───generate
+│   │   │   │   │   │   ├───resolvers
+│   │   │   │   │   │   └───types
+│   │   │   │   │   └───typescript
+│   │   │   │   ├───next-devtools
+│   │   │   │   │   ├───server
+│   │   │   │   │   │   └───font
+│   │   │   │   │   ├───shared
+│   │   │   │   │   └───userspace
+│   │   │   │   │       ├───app
+│   │   │   │   │       │   └───errors
+│   │   │   │   │       └───pages
+│   │   │   │   ├───pages
+│   │   │   │   ├───server
+│   │   │   │   │   ├───after
+│   │   │   │   │   ├───api-utils
+│   │   │   │   │   │   └───node
+│   │   │   │   │   ├───app-render
+│   │   │   │   │   │   ├───instant-validation
+│   │   │   │   │   │   ├───metadata-insertion
+│   │   │   │   │   │   ├───module-loading
+│   │   │   │   │   │   └───rsc
+│   │   │   │   │   ├───async-storage
+│   │   │   │   │   ├───base-http
+│   │   │   │   │   ├───dev
+│   │   │   │   │   │   └───browser-logs
+│   │   │   │   │   ├───instrumentation
+│   │   │   │   │   ├───lib
+│   │   │   │   │   │   ├───cache-handlers
+│   │   │   │   │   │   ├───experimental
+│   │   │   │   │   │   ├───incremental-cache
+│   │   │   │   │   │   ├───module-loader
+│   │   │   │   │   │   ├───router-utils
+│   │   │   │   │   │   ├───server-ipc
+│   │   │   │   │   │   └───trace
+│   │   │   │   │   ├───mcp
+│   │   │   │   │   │   └───tools
+│   │   │   │   │   │       └───utils
+│   │   │   │   │   ├───node-environment-extensions
+│   │   │   │   │   ├───normalizers
+│   │   │   │   │   │   ├───built
+│   │   │   │   │   │   │   ├───app
+│   │   │   │   │   │   │   └───pages
+│   │   │   │   │   │   └───request
+│   │   │   │   │   ├───og
+│   │   │   │   │   ├───request
+│   │   │   │   │   ├───response-cache
+│   │   │   │   │   ├───resume-data-cache
+│   │   │   │   │   ├───route-definitions
+│   │   │   │   │   ├───route-matcher-managers
+│   │   │   │   │   ├───route-matcher-providers
+│   │   │   │   │   │   ├───dev
+│   │   │   │   │   │   │   └───helpers
+│   │   │   │   │   │   │       └───file-reader
+│   │   │   │   │   │   └───helpers
+│   │   │   │   │   │       └───manifest-loaders
+│   │   │   │   │   ├───route-matchers
+│   │   │   │   │   ├───route-matches
+│   │   │   │   │   ├───route-modules
+│   │   │   │   │   │   ├───app-page
+│   │   │   │   │   │   │   ├───helpers
+│   │   │   │   │   │   │   └───vendored
+│   │   │   │   │   │   │       ├───contexts
+│   │   │   │   │   │   │       ├───rsc
+│   │   │   │   │   │   │       └───ssr
+│   │   │   │   │   │   ├───app-route
+│   │   │   │   │   │   │   └───helpers
+│   │   │   │   │   │   ├───pages
+│   │   │   │   │   │   │   ├───builtin
+│   │   │   │   │   │   │   └───vendored
+│   │   │   │   │   │   │       └───contexts
+│   │   │   │   │   │   └───pages-api
+│   │   │   │   │   ├───stream-utils
+│   │   │   │   │   ├───typescript
+│   │   │   │   │   │   └───rules
+│   │   │   │   │   ├───use-cache
+│   │   │   │   │   └───web
+│   │   │   │   │       ├───exports
+│   │   │   │   │       ├───sandbox
+│   │   │   │   │       └───spec-extension
+│   │   │   │   │           └───adapters
+│   │   │   │   └───shared
+│   │   │   │       └───lib
+│   │   │   │           ├───errors
+│   │   │   │           ├───i18n
+│   │   │   │           ├───isomorphic
+│   │   │   │           ├───lazy-dynamic
+│   │   │   │           ├───page-path
+│   │   │   │           ├───router
+│   │   │   │           │   ├───routes
+│   │   │   │           │   └───utils
+│   │   │   │           ├───segment-cache
+│   │   │   │           ├───turbopack
+│   │   │   │           └───utils
+│   │   │   ├───experimental
+│   │   │   │   ├───testing
+│   │   │   │   │   └───server
+│   │   │   │   └───testmode
+│   │   │   │       ├───playwright
+│   │   │   │       └───proxy
+│   │   │   ├───export
+│   │   │   │   ├───helpers
+│   │   │   │   └───routes
+│   │   │   ├───lib
+│   │   │   │   ├───framework
+│   │   │   │   ├───fs
+│   │   │   │   ├───helpers
+│   │   │   │   ├───memory
+│   │   │   │   ├───metadata
+│   │   │   │   │   ├───generate
+│   │   │   │   │   ├───resolvers
+│   │   │   │   │   └───types
+│   │   │   │   └───typescript
+│   │   │   ├───next-devtools
+│   │   │   │   ├───dev-overlay
+│   │   │   │   │   ├───components
+│   │   │   │   │   │   ├───call-stack
+│   │   │   │   │   │   ├───call-stack-frame
+│   │   │   │   │   │   ├───code-frame
+│   │   │   │   │   │   ├───copy-button
+│   │   │   │   │   │   ├───devtools-indicator
+│   │   │   │   │   │   │   └───hooks
+│   │   │   │   │   │   ├───devtools-panel
+│   │   │   │   │   │   │   └───resize
+│   │   │   │   │   │   ├───dialog
+│   │   │   │   │   │   ├───errors
+│   │   │   │   │   │   │   ├───dev-tools-indicator
+│   │   │   │   │   │   │   │   └───dev-tools-info
+│   │   │   │   │   │   │   ├───dialog
+│   │   │   │   │   │   │   ├───environment-name-label
+│   │   │   │   │   │   │   ├───error-message
+│   │   │   │   │   │   │   ├───error-overlay
+│   │   │   │   │   │   │   ├───error-overlay-bottom-stack
+│   │   │   │   │   │   │   ├───error-overlay-call-stack
+│   │   │   │   │   │   │   ├───error-overlay-footer
+│   │   │   │   │   │   │   │   └───error-feedback
+│   │   │   │   │   │   │   ├───error-overlay-layout
+│   │   │   │   │   │   │   ├───error-overlay-nav
+│   │   │   │   │   │   │   ├───error-overlay-pagination
+│   │   │   │   │   │   │   ├───error-overlay-toolbar
+│   │   │   │   │   │   │   ├───error-type-label
+│   │   │   │   │   │   │   └───overlay
+│   │   │   │   │   │   ├───fader
+│   │   │   │   │   │   ├───hot-linked-text
+│   │   │   │   │   │   ├───hydration-diff
+│   │   │   │   │   │   ├───instant-navs
+│   │   │   │   │   │   ├───overlay
+│   │   │   │   │   │   ├───overview
+│   │   │   │   │   │   ├───resizer
+│   │   │   │   │   │   ├───terminal
+│   │   │   │   │   │   ├───toast
+│   │   │   │   │   │   ├───tooltip
+│   │   │   │   │   │   └───version-staleness-info
+│   │   │   │   │   ├───container
+│   │   │   │   │   │   └───runtime-error
+│   │   │   │   │   ├───font
+│   │   │   │   │   ├───hooks
+│   │   │   │   │   ├───icons
+│   │   │   │   │   │   └───thumbs
+│   │   │   │   │   ├───menu
+│   │   │   │   │   ├───panel
+│   │   │   │   │   ├───styles
+│   │   │   │   │   └───utils
+│   │   │   │   ├───server
+│   │   │   │   │   └───font
+│   │   │   │   ├───shared
+│   │   │   │   └───userspace
+│   │   │   │       ├───app
+│   │   │   │       │   └───errors
+│   │   │   │       └───pages
+│   │   │   ├───pages
+│   │   │   ├───server
+│   │   │   │   ├───after
+│   │   │   │   ├───api-utils
+│   │   │   │   │   └───node
+│   │   │   │   ├───app-render
+│   │   │   │   │   ├───instant-validation
+│   │   │   │   │   ├───metadata-insertion
+│   │   │   │   │   ├───module-loading
+│   │   │   │   │   └───rsc
+│   │   │   │   ├───async-storage
+│   │   │   │   ├───base-http
+│   │   │   │   ├───dev
+│   │   │   │   │   └───browser-logs
+│   │   │   │   ├───instrumentation
+│   │   │   │   ├───lib
+│   │   │   │   │   ├───cache-handlers
+│   │   │   │   │   ├───experimental
+│   │   │   │   │   ├───incremental-cache
+│   │   │   │   │   ├───module-loader
+│   │   │   │   │   ├───router-utils
+│   │   │   │   │   ├───server-ipc
+│   │   │   │   │   └───trace
+│   │   │   │   ├───mcp
+│   │   │   │   │   └───tools
+│   │   │   │   │       └───utils
+│   │   │   │   ├───node-environment-extensions
+│   │   │   │   ├───normalizers
+│   │   │   │   │   ├───built
+│   │   │   │   │   │   ├───app
+│   │   │   │   │   │   └───pages
+│   │   │   │   │   └───request
+│   │   │   │   ├───og
+│   │   │   │   ├───request
+│   │   │   │   ├───response-cache
+│   │   │   │   ├───resume-data-cache
+│   │   │   │   ├───route-definitions
+│   │   │   │   ├───route-matcher-managers
+│   │   │   │   ├───route-matcher-providers
+│   │   │   │   │   ├───dev
+│   │   │   │   │   │   └───helpers
+│   │   │   │   │   │       └───file-reader
+│   │   │   │   │   └───helpers
+│   │   │   │   │       └───manifest-loaders
+│   │   │   │   ├───route-matchers
+│   │   │   │   ├───route-matches
+│   │   │   │   ├───route-modules
+│   │   │   │   │   ├───app-page
+│   │   │   │   │   │   ├───helpers
+│   │   │   │   │   │   └───vendored
+│   │   │   │   │   │       ├───contexts
+│   │   │   │   │   │       ├───rsc
+│   │   │   │   │   │       └───ssr
+│   │   │   │   │   ├───app-route
+│   │   │   │   │   │   └───helpers
+│   │   │   │   │   ├───pages
+│   │   │   │   │   │   ├───builtin
+│   │   │   │   │   │   └───vendored
+│   │   │   │   │   │       └───contexts
+│   │   │   │   │   └───pages-api
+│   │   │   │   ├───stream-utils
+│   │   │   │   ├───typescript
+│   │   │   │   │   └───rules
+│   │   │   │   ├───use-cache
+│   │   │   │   └───web
+│   │   │   │       ├───exports
+│   │   │   │       ├───sandbox
+│   │   │   │       └───spec-extension
+│   │   │   │           └───adapters
+│   │   │   ├───shared
+│   │   │   │   └───lib
+│   │   │   │       ├───errors
+│   │   │   │       ├───i18n
+│   │   │   │       ├───isomorphic
+│   │   │   │       ├───lazy-dynamic
+│   │   │   │       ├───page-path
+│   │   │   │       ├───router
+│   │   │   │       │   ├───routes
+│   │   │   │       │   └───utils
+│   │   │   │       ├───segment-cache
+│   │   │   │       ├───turbopack
+│   │   │   │       └───utils
+│   │   │   ├───styled-jsx
+│   │   │   │   └───types
+│   │   │   ├───telemetry
+│   │   │   │   └───events
+│   │   │   └───trace
+│   │   │       └───report
+│   │   ├───experimental
+│   │   │   ├───testing
+│   │   │   └───testmode
+│   │   │       └───playwright
+│   │   ├───font
+│   │   │   ├───google
+│   │   │   └───local
+│   │   ├───image-types
+│   │   ├───legacy
+│   │   ├───navigation-types
+│   │   │   └───compat
+│   │   ├───node_modules
+│   │   │   └───postcss
+│   │   │       └───lib
+│   │   └───types
+│   ├───node-releases
+│   │   └───data
+│   │       ├───processed
+│   │       └───release-schedule
+│   ├───normalize-path
+│   ├───object-assign
+│   ├───object-hash
+│   │   └───dist
+│   ├───path-key
+│   ├───path-parse
+│   ├───picocolors
+│   ├───picomatch
+│   │   └───lib
+│   ├───pify
+│   ├───pirates
+│   │   └───lib
+│   ├───postcss
+│   │   └───lib
+│   ├───postcss-import
+│   │   └───lib
+│   ├───postcss-js
+│   ├───postcss-load-config
+│   │   └───src
+│   ├───postcss-nested
+│   ├───postcss-selector-parser
+│   │   └───dist
+│   │       ├───selectors
+│   │       └───util
+│   ├───postcss-value-parser
+│   │   └───lib
+│   ├───potpack
+│   ├───prisma
+│   │   ├───build
+│   │   │   └───public
+│   │   │       ├───assets
+│   │   │       ├───http
+│   │   │       └───pages
+│   │   │           └───http
+│   │   ├───preinstall
+│   │   ├───prisma-client
+│   │   │   ├───generator-build
+│   │   │   ├───runtime
+│   │   │   └───scripts
+│   │   └───scripts
+│   ├───promise-worker-transferable
+│   │   └───dist
+│   ├───queue-microtask
+│   ├───react
+│   │   └───cjs
+│   ├───react-dom
+│   │   └───cjs
+│   ├───react-use-measure
+│   │   ├───dist
+│   │   └───src
+│   ├───read-cache
+│   ├───readdirp
+│   ├───require-from-string
+│   ├───resolve
+│   │   ├───.claude
+│   │   ├───.github
+│   │   ├───bin
+│   │   ├───example
+│   │   ├───lib
+│   │   └───test
+│   │       ├───dotdot
+│   │       │   └───abc
+│   │       ├───module_dir
+│   │       │   ├───xmodules
+│   │       │   │   └───aaa
+│   │       │   ├───ymodules
+│   │       │   │   └───aaa
+│   │       │   └───zmodules
+│   │       │       └───bbb
+│   │       ├───node_path
+│   │       │   ├───x
+│   │       │   │   ├───aaa
+│   │       │   │   └───ccc
+│   │       │   └───y
+│   │       │       ├───bbb
+│   │       │       └───ccc
+│   │       ├───pathfilter
+│   │       │   └───deep_ref
+│   │       ├───precedence
+│   │       │   ├───aaa
+│   │       │   └───bbb
+│   │       ├───resolver
+│   │       │   ├───baz
+│   │       │   ├───browser_field
+│   │       │   ├───dot_main
+│   │       │   ├───dot_slash_main
+│   │       │   ├───false_main
+│   │       │   ├───incorrect_main
+│   │       │   ├───invalid_main
+│   │       │   ├───multirepo
+│   │       │   │   └───packages
+│   │       │   │       ├───package-a
+│   │       │   │       └───package-b
+│   │       │   ├───nested_symlinks
+│   │       │   │   └───mylib
+│   │       │   ├───other_path
+│   │       │   │   └───lib
+│   │       │   ├───quux
+│   │       │   │   └───foo
+│   │       │   ├───same_names
+│   │       │   │   └───foo
+│   │       │   ├───symlinked
+│   │       │   │   ├───package
+│   │       │   │   └───_
+│   │       │   │       ├───node_modules
+│   │       │   │       └───symlink_target
+│   │       │   └───without_basedir
+│   │       └───shadowed_core
+│   │           └───node_modules
+│   │               └───util
+│   ├───reusify
+│   │   ├───.github
+│   │   │   └───workflows
+│   │   └───benchmarks
+│   ├───run-parallel
+│   ├───scheduler
+│   │   └───cjs
+│   ├───semver
+│   │   ├───bin
+│   │   ├───classes
+│   │   ├───functions
+│   │   ├───internal
+│   │   └───ranges
+│   ├───sharp
+│   │   ├───install
+│   │   ├───lib
+│   │   └───src
+│   ├───shebang-command
+│   ├───shebang-regex
+│   ├───source-map-js
+│   │   └───lib
+│   ├───stats-gl
+│   │   ├───dist
+│   │   ├───lib
+│   │   └───node_modules
+│   │       └───three
+│   │           ├───build
+│   │           ├───examples
+│   │           │   ├───fonts
+│   │           │   │   ├───droid
+│   │           │   │   └───ttf
+│   │           │   └───jsm
+│   │           │       ├───animation
+│   │           │       ├───capabilities
+│   │           │       ├───controls
+│   │           │       ├───csm
+│   │           │       ├───curves
+│   │           │       ├───effects
+│   │           │       ├───environments
+│   │           │       ├───exporters
+│   │           │       ├───geometries
+│   │           │       ├───helpers
+│   │           │       ├───interactive
+│   │           │       ├───libs
+│   │           │       │   ├───basis
+│   │           │       │   ├───draco
+│   │           │       │   │   └───gltf
+│   │           │       │   └───rhino3dm
+│   │           │       ├───lighting
+│   │           │       ├───lights
+│   │           │       ├───lines
+│   │           │       │   └───webgpu
+│   │           │       ├───loaders
+│   │           │       │   └───lwo
+│   │           │       ├───materials
+│   │           │       ├───math
+│   │           │       ├───misc
+│   │           │       ├───modifiers
+│   │           │       ├───objects
+│   │           │       ├───offscreen
+│   │           │       ├───physics
+│   │           │       ├───postprocessing
+│   │           │       ├───renderers
+│   │           │       ├───shaders
+│   │           │       ├───textures
+│   │           │       ├───transpiler
+│   │           │       ├───tsl
+│   │           │       │   ├───display
+│   │           │       │   └───lighting
+│   │           │       ├───utils
+│   │           │       └───webxr
+│   │           └───src
+│   │               ├───animation
+│   │               │   └───tracks
+│   │               ├───audio
+│   │               ├───cameras
+│   │               ├───core
+│   │               ├───extras
+│   │               │   ├───core
+│   │               │   └───curves
+│   │               ├───geometries
+│   │               ├───helpers
+│   │               ├───lights
+│   │               │   └───webgpu
+│   │               ├───loaders
+│   │               │   └───nodes
+│   │               ├───materials
+│   │               │   └───nodes
+│   │               │       └───manager
+│   │               ├───math
+│   │               │   └───interpolants
+│   │               ├───nodes
+│   │               │   ├───accessors
+│   │               │   ├───code
+│   │               │   ├───core
+│   │               │   ├───display
+│   │               │   ├───fog
+│   │               │   ├───functions
+│   │               │   │   ├───BSDF
+│   │               │   │   └───material
+│   │               │   ├───geometry
+│   │               │   ├───gpgpu
+│   │               │   ├───lighting
+│   │               │   ├───materialx
+│   │               │   │   └───lib
+│   │               │   ├───math
+│   │               │   ├───parsers
+│   │               │   ├───pmrem
+│   │               │   ├───procedural
+│   │               │   ├───tsl
+│   │               │   └───utils
+│   │               ├───objects
+│   │               ├───renderers
+│   │               │   ├───common
+│   │               │   │   ├───extras
+│   │               │   │   └───nodes
+│   │               │   ├───shaders
+│   │               │   │   ├───ShaderChunk
+│   │               │   │   └───ShaderLib
+│   │               │   ├───webgl
+│   │               │   ├───webgl-fallback
+│   │               │   │   ├───nodes
+│   │               │   │   └───utils
+│   │               │   ├───webgpu
+│   │               │   │   ├───nodes
+│   │               │   │   └───utils
+│   │               │   └───webxr
+│   │               ├───scenes
+│   │               └───textures
+│   ├───stats.js
+│   │   ├───build
+│   │   └───src
+│   ├───styled-jsx
+│   │   ├───dist
+│   │   │   ├───babel
+│   │   │   ├───index
+│   │   │   └───webpack
+│   │   └───lib
+│   ├───sucrase
+│   │   ├───bin
+│   │   ├───dist
+│   │   │   ├───esm
+│   │   │   │   ├───parser
+│   │   │   │   │   ├───plugins
+│   │   │   │   │   │   └───jsx
+│   │   │   │   │   ├───tokenizer
+│   │   │   │   │   ├───traverser
+│   │   │   │   │   └───util
+│   │   │   │   ├───transformers
+│   │   │   │   └───util
+│   │   │   ├───parser
+│   │   │   │   ├───plugins
+│   │   │   │   │   └───jsx
+│   │   │   │   ├───tokenizer
+│   │   │   │   ├───traverser
+│   │   │   │   └───util
+│   │   │   ├───transformers
+│   │   │   ├───types
+│   │   │   │   ├───parser
+│   │   │   │   │   ├───plugins
+│   │   │   │   │   │   └───jsx
+│   │   │   │   │   ├───tokenizer
+│   │   │   │   │   ├───traverser
+│   │   │   │   │   └───util
+│   │   │   │   ├───transformers
+│   │   │   │   └───util
+│   │   │   └───util
+│   │   ├───register
+│   │   └───ts-node-plugin
+│   ├───supports-preserve-symlinks-flag
+│   │   ├───.github
+│   │   └───test
+│   ├───suspend-react
+│   ├───tailwindcss
+│   │   ├───lib
+│   │   │   ├───cli
+│   │   │   │   ├───build
+│   │   │   │   ├───help
+│   │   │   │   └───init
+│   │   │   ├───css
+│   │   │   ├───lib
+│   │   │   ├───postcss-plugins
+│   │   │   │   └───nesting
+│   │   │   ├───public
+│   │   │   ├───util
+│   │   │   └───value-parser
+│   │   ├───nesting
+│   │   ├───node_modules
+│   │   ├───peers
+│   │   ├───scripts
+│   │   ├───src
+│   │   │   ├───cli
+│   │   │   │   ├───build
+│   │   │   │   ├───help
+│   │   │   │   └───init
+│   │   │   ├───css
+│   │   │   ├───lib
+│   │   │   ├───postcss-plugins
+│   │   │   │   └───nesting
+│   │   │   ├───public
+│   │   │   ├───util
+│   │   │   └───value-parser
+│   │   ├───stubs
+│   │   └───types
+│   │       └───generated
+│   ├───thenify
+│   ├───thenify-all
+│   ├───three
+│   │   ├───build
+│   │   ├───examples
+│   │   │   └───jsm
+│   │   │       ├───animation
+│   │   │       ├───capabilities
+│   │   │       ├───controls
+│   │   │       ├───csm
+│   │   │       ├───curves
+│   │   │       ├───effects
+│   │   │       ├───environments
+│   │   │       ├───exporters
+│   │   │       ├───generators
+│   │   │       │   └───city
+│   │   │       ├───geometries
+│   │   │       ├───gpgpu
+│   │   │       ├───helpers
+│   │   │       ├───inspector
+│   │   │       │   ├───extensions
+│   │   │       │   │   └───tsl-graph
+│   │   │       │   ├───tabs
+│   │   │       │   └───ui
+│   │   │       ├───interaction
+│   │   │       ├───interactive
+│   │   │       ├───libs
+│   │   │       │   ├───basis
+│   │   │       │   └───draco
+│   │   │       │       └───gltf
+│   │   │       ├───lighting
+│   │   │       ├───lights
+│   │   │       ├───lines
+│   │   │       │   └───webgpu
+│   │   │       ├───loaders
+│   │   │       │   ├───collada
+│   │   │       │   ├───lwo
+│   │   │       │   └───usd
+│   │   │       ├───materials
+│   │   │       ├───math
+│   │   │       ├───misc
+│   │   │       ├───modifiers
+│   │   │       ├───objects
+│   │   │       ├───offscreen
+│   │   │       ├───physics
+│   │   │       ├───postprocessing
+│   │   │       ├───renderers
+│   │   │       ├───shaders
+│   │   │       ├───textures
+│   │   │       ├───transpiler
+│   │   │       ├───tsl
+│   │   │       │   ├───display
+│   │   │       │   ├───lighting
+│   │   │       │   │   └───data
+│   │   │       │   ├───math
+│   │   │       │   ├───shadows
+│   │   │       │   └───utils
+│   │   │       ├───utils
+│   │   │       └───webxr
+│   │   └───src
+│   │       ├───animation
+│   │       │   └───tracks
+│   │       ├───audio
+│   │       ├───cameras
+│   │       ├───core
+│   │       ├───extras
+│   │       │   ├───core
+│   │       │   ├───curves
+│   │       │   └───lib
+│   │       ├───geometries
+│   │       ├───helpers
+│   │       ├───lights
+│   │       │   └───webgpu
+│   │       ├───loaders
+│   │       │   └───nodes
+│   │       ├───materials
+│   │       │   └───nodes
+│   │       │       └───manager
+│   │       ├───math
+│   │       │   └───interpolants
+│   │       ├───nodes
+│   │       │   ├───accessors
+│   │       │   ├───code
+│   │       │   ├───core
+│   │       │   ├───display
+│   │       │   ├───fog
+│   │       │   ├───functions
+│   │       │   │   ├───BSDF
+│   │       │   │   └───material
+│   │       │   ├───geometry
+│   │       │   ├───gpgpu
+│   │       │   ├───lighting
+│   │       │   ├───materialx
+│   │       │   │   └───lib
+│   │       │   ├───math
+│   │       │   ├───parsers
+│   │       │   ├───pmrem
+│   │       │   ├───procedural
+│   │       │   ├───shapes
+│   │       │   ├───tsl
+│   │       │   └───utils
+│   │       ├───objects
+│   │       ├───renderers
+│   │       │   ├───common
+│   │       │   │   ├───extras
+│   │       │   │   └───nodes
+│   │       │   ├───shaders
+│   │       │   │   ├───ShaderChunk
+│   │       │   │   └───ShaderLib
+│   │       │   ├───webgl
+│   │       │   ├───webgl-fallback
+│   │       │   │   ├───nodes
+│   │       │   │   └───utils
+│   │       │   ├───webgpu
+│   │       │   │   ├───descriptors
+│   │       │   │   ├───nodes
+│   │       │   │   └───utils
+│   │       │   └───webxr
+│   │       ├───scenes
+│   │       └───textures
+│   ├───three-mesh-bvh
+│   │   ├───build
+│   │   └───src
+│   │       ├───core
+│   │       │   ├───build
+│   │       │   ├───cast
+│   │       │   └───utils
+│   │       ├───debug
+│   │       ├───gpu
+│   │       │   └───glsl
+│   │       ├───math
+│   │       ├───objects
+│   │       ├───utils
+│   │       └───workers
+│   │           └───utils
+│   ├───three-stdlib
+│   │   ├───animation
+│   │   ├───cameras
+│   │   ├───controls
+│   │   │   └───experimental
+│   │   ├───csm
+│   │   ├───curves
+│   │   ├───deprecated
+│   │   ├───effects
+│   │   ├───environments
+│   │   ├───exporters
+│   │   ├───geometries
+│   │   ├───helpers
+│   │   ├───interactive
+│   │   ├───libs
+│   │   ├───lights
+│   │   ├───lines
+│   │   ├───loaders
+│   │   │   └───lwo
+│   │   ├───math
+│   │   ├───misc
+│   │   ├───modifiers
+│   │   ├───node_modules
+│   │   │   └───fflate
+│   │   │       ├───esm
+│   │   │       ├───lib
+│   │   │       └───umd
+│   │   ├───objects
+│   │   ├───physics
+│   │   ├───postprocessing
+│   │   ├───renderers
+│   │   ├───shaders
+│   │   ├───textures
+│   │   ├───types
+│   │   ├───utils
+│   │   ├───webxr
+│   │   └───_polyfill
+│   ├───tinyglobby
+│   │   ├───dist
+│   │   └───node_modules
+│   │       ├───fdir
+│   │       │   └───dist
+│   │       └───picomatch
+│   │           └───lib
+│   ├───to-regex-range
+│   ├───troika-three-text
+│   │   ├───dist
+│   │   ├───libs
+│   │   └───src
+│   ├───troika-three-utils
+│   │   ├───dist
+│   │   ├───docs
+│   │   └───src
+│   ├───troika-worker-utils
+│   │   ├───dist
+│   │   ├───src
+│   │   └───__tests__
+│   ├───ts-interface-checker
+│   │   └───dist
+│   ├───tslib
+│   │   └───modules
+│   ├───tunnel-rat
+│   │   ├───.changeset
+│   │   ├───.github
+│   │   │   └───workflows
+│   │   ├───dist
+│   │   ├───node_modules
+│   │   │   └───zustand
+│   │   │       ├───esm
+│   │   │       │   ├───middleware
+│   │   │       │   ├───react
+│   │   │       │   └───vanilla
+│   │   │       ├───middleware
+│   │   │       ├───react
+│   │   │       ├───system
+│   │   │       │   ├───middleware
+│   │   │       │   ├───react
+│   │   │       │   └───vanilla
+│   │   │       ├───ts3.4
+│   │   │       │   ├───esm
+│   │   │       │   │   ├───middleware
+│   │   │       │   │   ├───react
+│   │   │       │   │   └───vanilla
+│   │   │       │   ├───middleware
+│   │   │       │   ├───react
+│   │   │       │   └───vanilla
+│   │   │       ├───umd
+│   │   │       │   ├───middleware
+│   │   │       │   ├───react
+│   │   │       │   └───vanilla
+│   │   │       └───vanilla
+│   │   ├───src
+│   │   └───test
+│   ├───typescript
+│   │   ├───bin
+│   │   └───lib
+│   │       ├───cs
+│   │       ├───de
+│   │       ├───es
+│   │       ├───fr
+│   │       ├───it
+│   │       ├───ja
+│   │       ├───ko
+│   │       ├───pl
+│   │       ├───pt-br
+│   │       ├───ru
+│   │       ├───tr
+│   │       ├───zh-cn
+│   │       └───zh-tw
+│   ├───undici-types
+│   ├───update-browserslist-db
+│   ├───use-sync-external-store
+│   │   ├───cjs
+│   │   │   └───use-sync-external-store-shim
+│   │   └───shim
+│   ├───util-deprecate
+│   ├───utility-types
+│   │   └───dist
+│   ├───webgl-constants
+│   │   ├───dist
+│   │   │   ├───lib
+│   │   │   └───types
+│   │   └───src
+│   ├───webgl-sdf-generator
+│   │   └───dist
+│   ├───which
+│   │   └───bin
+│   └───zustand
+│       ├───esm
+│       │   ├───middleware
+│       │   ├───react
+│       │   └───vanilla
+│       ├───middleware
+│       ├───react
+│       └───vanilla
+├───prisma
+│   ├───migrations
+│   │   └───20260707111500_init_postgres
+│   └───migrations2
+│       ├───20260706091922_init
+│       ├───20260706092506_init
+│       ├───20260706100352_add_email
+│       └───20260706121115_add_last_daily_date
+├───public
+│   ├───models
+│   └───sounds
+└───src
+    ├───app
+    │   ├───api
+    │   │   ├───auth
+    │   │   │   ├───login
+    │   │   │   └───register
+    │   │   ├───badges
+    │   │   ├───daily
+    │   │   │   └───finish
+    │   │   ├───game
+    │   │   │   ├───finish
+    │   │   │   └───questions
+    │   │   ├───mastery
+    │   │   │   └───progress
+    │   │   ├───register
+    │   │   └───user
+    │   │       └───avatar
+    │   ├───badges
+    │   ├───daily
+    │   ├───dashboard
+    │   ├───game
+    │   │   └───[subject]
+    │   ├───games
+    │   │   ├───hangman
+    │   │   ├───memory
+    │   │   ├───pong
+    │   │   ├───rps
+    │   │   ├───simon
+    │   │   ├───snake
+    │   │   ├───tictactoe
+    │   │   └───whack
+    │   ├───login
+    │   ├───mastery
+    │   └───register
+    ├───components
+    └───lib

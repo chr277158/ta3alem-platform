@@ -100,44 +100,34 @@ const [userAvatar, setUserAvatar] = useState('robot');
     }
   };
 
-const handleAnswer = async (answerIndex: number) => {
-  if (showExplanation) return;
+  const handleAnswer = async (answerIndex: number) => {
+    if (showExplanation) return;
 
-  setSelectedAnswer(answerIndex);
-  setShowExplanation(true);
+    setSelectedAnswer(answerIndex);
+    setShowExplanation(true);
 
-  const isCorrect = answerIndex === questions[currentQuestion].correctAnswer;
+    const isCorrect = answerIndex === questions[currentQuestion].correctAnswer;
 
-  if (isCorrect) {
-    setScore(score + 1);
-    setCompanionMood('happy'); // 😃 الشخصية تفرح
-    playSound('correct');
-  } else {
-    setHearts(hearts - 1);
-    setCompanionMood('sad'); // 😢 الشخصية تحزن
-    playSound('wrong');
-  }
-
-  setTimeout(() => {
-    setCompanionMood('neutral'); // 😐 العودة للوضع الطبيعي
-    if (currentQuestion < questions.length - 1 && hearts > 0) {
-      setCurrentQuestion(currentQuestion + 1);
-      setShowExplanation(false);
-      setSelectedAnswer(null);
+    if (isCorrect) {
+      scoreRef.current += 1;
+      setScore(scoreRef.current);
+      setCompanionMood('happy'); // 😃 الشخصية تفرح
+      playSound('correct');
     } else {
-      finishGame();
+      heartsRef.current -= 1;
+      setHearts(heartsRef.current);
+      setCompanionMood('sad'); // 😢 الشخصية تحزن
+      playSound('wrong');
     }
-  }, 3000);
-};
 
     // الانتقال للسؤال التالي بعد 3 ثواني
     setTimeout(() => {
+      setCompanionMood('neutral'); // 😐 العودة للوضع الطبيعي
       if (currentQuestion < questions.length - 1 && heartsRef.current > 0) {
         setCurrentQuestion(currentQuestion + 1);
         setShowExplanation(false);
         setSelectedAnswer(null);
       } else {
-        // ✅ استخدام scoreRef.current بدلاً من score
         finishGame(scoreRef.current);
       }
     }, 3000);
@@ -263,7 +253,10 @@ const handleAnswer = async (answerIndex: number) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-6" dir="rtl">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-2xl mx-auto relative">
+        <div className="absolute -top-4 left-4 z-20">
+          <Companion3D avatarType={userAvatar} mood={companionMood} />
+        </div>
         <div className="bg-white rounded-2xl shadow-lg p-4 mb-6">
           <div className="flex justify-between items-center mb-4">
             <div className="flex gap-1">
@@ -273,10 +266,6 @@ const handleAnswer = async (answerIndex: number) => {
                 </span>
               ))}
             </div>
-            // داخل الـ return، في أعلى الصفحة:
-<div className="absolute top-4 left-4 z-20">
-  <Companion3D avatarType={userAvatar} mood={companionMood} />
-</div>
             <div className="text-2xl font-bold text-blue-600">
               {scoreRef.current}/{questions.length}
             </div>

@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  username      String   @unique
+  email         String?  @unique
+  password      String
+  avatar        String   @default("robot")
+  playerLevel   Int      @default(1)
+  totalPoints   Int      @default(0)
+  streakDays    Int      @default(0)
+  darkMode      Boolean  @default(false)
+  lastDailyDate String?
+  createdAt     DateTime @default(now())
+  
+  results           GameResult[]
+  badges            UserBadge[]
+  subjectProgress   SubjectProgress[]
+}
+
+
+model SubjectProgress {
+  id         String  @id @default(cuid())
+  userId     String
+  subject    String
+  level      Int
+  bestScore  Int     @default(0)
+  mastered   Boolean @default(false)
+  attempts   Int     @default(0)
+  
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, subject, level])
+}
+
+model Question {
+  id            String   @id @default(cuid())
+  subject       String
+  level         Int
+  question      String
+  options       String
+  correctAnswer Int
+  explanation   String?
+  createdAt     DateTime @default(now())
+}
+
+
+model GameResult {
+  id              String   @id @default(cuid())
+  userId          String
+  subject         String
+  level           Int
+  score           Int
+  totalQuestions  Int
+  heartsLost      Int      @default(0)
+  hintsUsed       Int      @default(0)
+  completedAt     DateTime @default(now())
+  
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Badge {
+  id              String   @id @default(cuid())
+  name            String   @unique
+  displayName     String
+  description     String
+  icon            String
+  gamesUnlocked   String
+  requiredLevel   Int
+  isFinalBadge    Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  
+  users           UserBadge[]
+}
+
+model UserBadge {
+  id        String   @id @default(cuid())
+  userId    String
+  badgeId   String
+  earnedAt  DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge     Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, badgeId])
+}
