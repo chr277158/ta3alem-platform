@@ -2,6 +2,9 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import { cookies } from 'next/headers';
+
+
 
 export async function POST(req: Request) {
   try {
@@ -46,6 +49,15 @@ export async function POST(req: Request) {
     }
 
     console.log('✅ Login successful:', username);
+
+    // بعد التحقق من كلمة المرور نضع الكوكي داخل الدالة
+    const cookieStore = cookies();
+    cookieStore.set('session', String(user.id), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 60 * 60 * 24 * 7 // أسبوع
+    });
 
     return NextResponse.json({
       success: true,
