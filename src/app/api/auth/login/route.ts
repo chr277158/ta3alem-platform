@@ -4,13 +4,10 @@ import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
 
-
-
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { username, password } = body;
-
     console.log('🔐 Login attempt:', username);
 
     if (!username || !password) {
@@ -20,18 +17,16 @@ export async function POST(req: Request) {
       );
     }
 
-    // 🔑 البحث بـ username أو email
     const user = await prisma.user.findFirst({
       where: {
         OR: [
           { username: username },
-          { email: username }  // ← البحث بـ email أيضاً
+          { email: username }
         ]
       }
     });
 
     if (!user) {
-      console.log('❌ User not found:', username);
       return NextResponse.json(
         { success: false, error: 'بيانات الدخول غير صحيحة' },
         { status: 401 }
@@ -39,9 +34,7 @@ export async function POST(req: Request) {
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password);
-
     if (!isValidPassword) {
-      console.log('❌ Invalid password for:', username);
       return NextResponse.json(
         { success: false, error: 'بيانات الدخول غير صحيحة' },
         { status: 401 }
@@ -50,27 +43,27 @@ export async function POST(req: Request) {
 
     console.log('✅ Login successful:', username);
 
-    // بعد التحقق من كلمة المرور نضع الكوكي داخل الدالة
-    const cookieStore = cookies();
-    cookieStore.set('session', String(user.id), {
+    // 🔑 إصدار كوكيز الجلسة
+    const cookieStore = await cookies();
+    cookieStore.set('session', user.id, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: 60 * 60 * 24 * 7 // أسبوع
     });
 
+    // ✅ لا نرسل userId للعميل - الخادم هو من يحدد الهوية من الكوكيز
     return NextResponse.json({
       success: true,
       user: {
-        id: user.id,
         username: user.username,
         email: user.email,
         playerLevel: user.playerLevel,
         totalPoints: user.totalPoints,
-        streakDays: user.streakDays
+        streakDays: user.streakDays,
+        avatar: user.avatar
       }
     });
-
   } catch (error) {
     console.error('❌ Login error:', error);
     return NextResponse.json(

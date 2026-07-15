@@ -39,16 +39,11 @@ const [userAvatar, setUserAvatar] = useState('robot');
 
   useEffect(() => {
   const fetchUserData = async () => {
-    const userId = localStorage.getItem('userId');
+   
     const storedAvatar = localStorage.getItem('userAvatar');
     if (storedAvatar) setUserAvatar(storedAvatar);
     
-    if (userId) {
-      try {
-        const res = await fetch(`/api/user/data?userId=${userId}`); // (تحتاج لإنشاء هذا الـ API البسيط أو تعديله)
-        // أو ببساطة استخدم localStorage إذا حفظته عند التسجيل
-      } catch (e) {}
-    }
+  
   };
   fetchUserData();
 }, []);
@@ -58,47 +53,48 @@ const [userAvatar, setUserAvatar] = useState('robot');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subject, level]);
 
-  const loadQuestions = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const userId = localStorage.getItem('userId');
-      console.log('🔍 Loading questions - userId:', userId, 'subject:', subject, 'level:', level);
-      
-      if (!userId) {
-        console.warn('⚠️ No userId found in localStorage');
-        setError('يجب تسجيل الدخول أولاً');
-        setTimeout(() => router.push('/login'), 2000);
-        return;
-      }
-
-      const url = `/api/game/questions?subject=${subject}&level=${level}&userId=${userId}`;
-      console.log('📡 Fetching:', url);
-      
-      const res = await fetch(url);
-      
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-      }
-      
-      const data = await res.json();
-      console.log('✅ Questions loaded:', data);
-
-      if (!data.questions || data.questions.length === 0) {
-        setError('لا توجد أسئلة متاحة لهذا المستوى');
-        setLoading(false);
-        return;
-      }
-
-      setQuestions(data.questions);
-      setLoading(false);
-    } catch (error) {
-      console.error('❌ Error loading questions:', error);
-      setError(`فشل تحميل الأسئلة: ${error instanceof Error ? error.message : 'خطأ غير معروف'}`);
-      setLoading(false);
+const loadQuestions = async () => {
+  try {
+    setLoading(true);
+    setError(null);
+    
+    // ✅ لا حاجة لإرسال userId - الخادم يقرأه من الكوكيز
+    const url = `/api/game/questions?subject=${subject}&level=${level}`;
+    console.log('📡 Fetching:', url);
+    
+    const res = await fetch(url, {
+      credentials: 'include' // ✅ مهم لإرسال الكوكيز مع الطلب
+    });
+    
+    if (res.status === 401) {
+      setError('يجب تسجيل الدخول أولاً');
+      setTimeout(() => router.push('/login'), 2000);
+      return;
     }
-  };
+    
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    }
+    
+    const data = await res.json();
+    console.log('✅ Questions loaded:', data);
+    
+    if (!data.questions || data.questions.length === 0) {
+      setError('لا توجد أسئلة متاحة لهذا المستوى');
+      setLoading(false);
+      return;
+    }
+    
+    setQuestions(data.questions);
+    setLoading(false);
+  } catch (error) {
+    console.error('❌ Error loading questions:', error);
+    setError(`فشل تحميل الأسئلة: ${error instanceof Error ? error.message : 'خطأ غير معروف'}`);
+    setLoading(false);
+  }
+};
+
+
 
   const handleAnswer = async (answerIndex: number) => {
     if (showExplanation) return;
@@ -133,41 +129,39 @@ const [userAvatar, setUserAvatar] = useState('robot');
     }, 3000);
   };
 
-  const finishGame = async (finalScore: number) => {
-    console.log(`🏁 Finishing game with score: ${finalScore}/5`);
-    setGameOver(true);
+ const finishGame = async (finalScore: number) => {
+  console.log(`🏁 Finishing game with score: ${finalScore}/5`);
+  setGameOver(true);
+  
+  try {
+    // ✅ لا حاجة لإرسال userId - الخادم يقرأه من الكوكيز
+    const res = await fetch('/api/game/finish', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include', // ✅ مهم لإرسال الكوكيز مع الطلب
+      body: JSON.stringify({
+        subject,
+        level,
+        score: finalScore,
+        totalQuestions: questions.length,
+        heartsLost: 3 - heartsRef.current,
+        hintsUsed: 0
+      })
+    });
     
-    try {
-      const userId = localStorage.getItem('userId');
-      if (!userId) return;
-
-      const res = await fetch('/api/game/finish', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId,
-          subject,
-          level,
-          score: finalScore,  // ✅ استخدام finalScore
-          totalQuestions: questions.length,
-          heartsLost: 3 - heartsRef.current,
-          hintsUsed: 0
-        })
-      });
-
-      const data = await res.json();
-      console.log('✅ Game finished:', data);
-      
-      if (data.newBadges && data.newBadges.length > 0) {
-        setNewBadges(data.newBadges);
-        setPointsEarned(data.pointsEarned);
-        setShowCelebration(true);
-        playSound('achievement');
-      }
-    } catch (error) {
-      console.error('Error finishing game:', error);
+    const data = await res.json();
+    console.log('✅ Game finished:', data);
+    
+    if (data.newBadges && data.newBadges.length > 0) {
+      setNewBadges(data.newBadges);
+      setPointsEarned(data.pointsEarned);
+      setShowCelebration(true);
+      playSound('achievement');
     }
-  };
+  } catch (error) {
+    console.error('Error finishing game:', error);
+  }
+};
 
   if (loading) {
     return (

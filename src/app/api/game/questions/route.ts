@@ -1,27 +1,37 @@
 // src/app/api/game/questions/route.ts
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { cookies } from 'next/headers';
 
 export async function GET(req: Request) {
   try {
+    // 🔑 قراءة userId من الكوكيز الآمنة
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get('session');
+    
+    if (!sessionCookie) {
+      return NextResponse.json(
+        { error: 'غير مصرح - يجب تسجيل الدخول' },
+        { status: 401 }
+      );
+    }
+    
+    const userId = sessionCookie.value;
     const { searchParams } = new URL(req.url);
     const subject = searchParams.get('subject');
     const levelParam = searchParams.get('level');
-    const userId = searchParams.get('userId');
 
     console.log('📡 API /game/questions - params:', { subject, levelParam, userId });
 
-    if (!subject || !levelParam || !userId) {
+    if (!subject || !levelParam) {
       return NextResponse.json(
-        { error: 'المعاملات المطلوبة: subject, level, userId' },
+        { error: 'المعاملات المطلوبة: subject, level' },
         { status: 400 }
       );
     }
 
-    // 🔑 الحل الأساسي: تحويل level إلى number
     const level = parseInt(levelParam);
 
-    // التحقق من وجود المستخدم
     const user = await prisma.user.findUnique({
       where: { id: userId }
     });
@@ -33,29 +43,18 @@ export async function GET(req: Request) {
       );
     }
 
-    // 🔍 استعلام مع تحويل level إلى number
     const allQuestions = await prisma.question.findMany({
       where: {
         subject: subject,
-        level: level  // ← هنا level هو number الآن
+        level: level
       }
     });
 
     console.log(`📚 Found ${allQuestions.length} questions for ${subject} level ${level}`);
 
     if (allQuestions.length === 0) {
-      // 💡 تشخيص: ما هي الأسئلة الموجودة فعلاً؟
-      const allInDb = await prisma.question.groupBy({
-        by: ['subject', 'level'],
-        _count: { id: true }
-      });
-      console.log('📊 الأسئلة الموجودة في قاعدة البيانات:', allInDb);
-      
       return NextResponse.json(
-        { 
-          error: `لا توجد أسئلة لمادة ${subject} مستوى ${level}`,
-          available: allInDb
-        },
+        { error: `لا توجد أسئلة لمادة ${subject} مستوى ${level}` },
         { status: 404 }
       );
     }
@@ -64,7 +63,6 @@ export async function GET(req: Request) {
     const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
     const selected = shuffled.slice(0, 5);
 
-    // تحويل options من JSON string إلى array
     const questions = selected.map(q => ({
       id: q.id,
       question: q.question,
@@ -80,7 +78,7 @@ export async function GET(req: Request) {
   } catch (error) {
     console.error('❌ Error in /api/game/questions:', error);
     return NextResponse.json(
-      { 
+      {
         error: 'فشل في جلب الأسئلة',
         details: error instanceof Error ? error.message : 'Unknown error'
       },

@@ -1,5 +1,4 @@
 'use client';
-
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -19,6 +18,7 @@ export default function LoginPage() {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // ✅ مهم لإرسال الكوكيز مع الطلب
         body: JSON.stringify({ username, password })
       });
 
@@ -30,18 +30,12 @@ export default function LoginPage() {
         return;
       }
 
-      console.log('✅ Login successful, saving:', data.user);
+      console.log('✅ Login successful');
       
-      // ✅ حفظ userId أولاً
-      localStorage.setItem('userId', data.user.id);
-      localStorage.setItem('username', data.user.username);
+      // ✅ لا حاجة لحفظ userId في localStorage - الخادم يدير الجلسة عبر الكوكيز
+      // الخادم أرسل كوكيز الجلسة تلقائياً عند تسجيل الدخول
       
-      console.log('🔍 userId saved to localStorage:', data.user.id);
-
-      // ✅ انتظار بسيط لضمان حفظ localStorage
-      await new Promise(resolve => setTimeout(resolve, 100));
-
-      // ثم الانتقال إلى لوحة التحكم
+      // الانتقال إلى لوحة التحكم
       router.push('/dashboard');
     } catch (err) {
       console.error('Login error:', err);

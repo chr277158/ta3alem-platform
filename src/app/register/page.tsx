@@ -1,5 +1,4 @@
 'use client';
-
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -33,6 +32,7 @@ export default function RegisterPage() {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // ✅ مهم لإرسال الكوكيز مع الطلب
         body: JSON.stringify({ name, email, level, password })
       });
 
@@ -44,11 +44,11 @@ export default function RegisterPage() {
         return;
       }
 
-      // ✅ حفظ userId و username في localStorage
-      console.log('✅ Register successful, saving:', data.user);
-      localStorage.setItem('userId', data.user.id);
-      localStorage.setItem('username', data.user.username || data.user.name);
-
+      console.log('✅ Register successful');
+      
+      // ✅ لا حاجة لحفظ userId في localStorage - الخادم يدير الجلسة عبر الكوكيز
+      // الخادم أرسل كوكيز الجلسة تلقائياً عند التسجيل
+      
       // الانتقال إلى لوحة التحكم
       router.push('/dashboard');
     } catch (err) {

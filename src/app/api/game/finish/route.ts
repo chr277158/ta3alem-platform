@@ -1,30 +1,43 @@
+// src/app/api/game/finish/route.ts
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { cookies } from 'next/headers';
 
-const SUBJECTS = ['math', 'science', 'body', 'environment', 
-                  'arabic', 'french', 'islamic', 'history'];
+const SUBJECTS = ['math', 'science', 'body', 'environment',
+  'arabic', 'french', 'islamic', 'history'];
 
 export async function POST(req: Request) {
   try {
+    // 🔑 قراءة userId من الكوكيز الآمنة
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get('session');
+    
+    if (!sessionCookie) {
+      return NextResponse.json(
+        { success: false, error: 'غير مصرح - يجب تسجيل الدخول' },
+        { status: 401 }
+      );
+    }
+    
+    const userId = sessionCookie.value;
+    
     const body = await req.json();
-    const { userId, subject, level, score, totalQuestions, heartsLost, hintsUsed } = body;
-
+    const { subject, level, score, totalQuestions, heartsLost, hintsUsed } = body;
+    
     console.log('🎮 Game finish attempt:', { userId, subject, level, score, totalQuestions });
 
-    if (!userId || !subject || !level || score === undefined) {
+    if (!subject || !level || score === undefined) {
       return NextResponse.json(
-        { success: false, error: 'المعاملات المطلوبة: userId, subject, level, score' },
+        { success: false, error: 'المعاملات المطلوبة: subject, level, score' },
         { status: 400 }
       );
     }
 
-    // التحقق من وجود المستخدم
     const user = await prisma.user.findUnique({
       where: { id: userId }
     });
 
     if (!user) {
-      console.log('❌ User not found:', userId);
       return NextResponse.json(
         { success: false, error: 'المستخدم غير موجود' },
         { status: 404 }
@@ -43,12 +56,10 @@ export async function POST(req: Request) {
         hintsUsed: hintsUsed || 0
       }
     });
-
     console.log('✅ Game result saved:', gameResult.id);
 
     // 2. تحديث تقدم المادة
-    const isMastered = score === 5; // 5/5 فقط = إتقان
-    
+    const isMastered = score === 5;
     const existingProgress = await prisma.subjectProgress.findUnique({
       where: { userId_subject_level: { userId, subject, level: parseInt(level) } }
     });
@@ -74,12 +85,11 @@ export async function POST(req: Request) {
         }
       });
     }
-
     console.log('✅ Subject progress updated');
 
     // 3. التحقق من شهادات الإتقان
     const newBadges = await checkMasteryBadges(userId);
-    
+
     // 4. تحديث المستوى العام للطفل
     await updateUserLevel(userId);
 
@@ -89,7 +99,6 @@ export async function POST(req: Request) {
       where: { id: userId },
       data: { totalPoints: { increment: pointsEarned } }
     });
-
     console.log('✅ Points updated:', pointsEarned);
 
     return NextResponse.json({ 
@@ -102,8 +111,8 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error('❌ Error finishing game:', error);
     return NextResponse.json(
-      { 
-        success: false, 
+      {
+        success: false,
         error: 'فشل في حفظ النتيجة',
         details: error instanceof Error ? error.message : 'Unknown error'
       },
@@ -114,12 +123,12 @@ export async function POST(req: Request) {
 
 async function checkMasteryBadges(userId: string) {
   const newBadges = [];
-  
   const badges = await prisma.badge.findMany();
   const earnedBadgeIds = await prisma.userBadge.findMany({
     where: { userId },
     select: { badgeId: true }
   });
+
   const earnedIds = new Set(earnedBadgeIds.map(b => b.badgeId));
 
   for (const badge of badges) {
@@ -151,13 +160,11 @@ async function checkMasteryBadges(userId: string) {
       console.log('🏆 Badge earned:', badge.displayName);
     }
   }
-
   return newBadges;
 }
 
 async function updateUserLevel(userId: string) {
   let highestMasteredLevel = 0;
-  
   for (let level = 5; level >= 1; level--) {
     const count = await prisma.subjectProgress.count({
       where: { userId, level, mastered: true }
@@ -167,7 +174,6 @@ async function updateUserLevel(userId: string) {
       break;
     }
   }
-  
   await prisma.user.update({
     where: { id: userId },
     data: { playerLevel: highestMasteredLevel + 1 }
