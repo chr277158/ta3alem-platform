@@ -34,9 +34,11 @@ export async function POST(req: Request) {
       path: '/'
     });
 
+    // ✅ لا نرسل userId للعميل - الخادم هو من يحدد الهوية من الكوكيز
     return NextResponse.json({
       success: true,
       user: {
+        id: user.id,
         username: user.username,
         email: user.email,
         playerLevel: user.playerLevel,
