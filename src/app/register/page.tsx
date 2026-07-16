@@ -32,7 +32,7 @@ export default function RegisterPage() {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // ✅ مهم لإرسال الكوكيز مع الطلب
+        credentials: 'include', // ضروري لقبول الكوكيز
         body: JSON.stringify({ name, email, level, password })
       });
 
@@ -44,16 +44,10 @@ export default function RegisterPage() {
         return;
       }
 
-      console.log('✅ Register successful');
-      
-      // ✅ لا حاجة لحفظ userId في localStorage - الخادم يدير الجلسة عبر الكوكيز
-      // الخادم أرسل كوكيز الجلسة تلقائياً عند التسجيل
-      
-      // الانتقال إلى لوحة التحكم
       router.push('/dashboard');
     } catch (err) {
       console.error('Register error:', err);
-      setError('حدث خطأ في الاتصال');
+      setError('حدث خطأ في الاتصال بالخادم');
     } finally {
       setLoading(false);
     }

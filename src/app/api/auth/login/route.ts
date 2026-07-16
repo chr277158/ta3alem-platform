@@ -1,4 +1,3 @@
-// src/app/api/auth/login/route.ts
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
@@ -8,51 +7,33 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { username, password } = body;
-    console.log('🔐 Login attempt:', username);
 
     if (!username || !password) {
-      return NextResponse.json(
-        { success: false, error: 'اسم المستخدم/البريد وكلمة المرور مطلوبان' },
-        { status: 400 }
-      );
+      return NextResponse.json({ success: false, error: 'اسم المستخدم/البريد وكلمة المرور مطلوبان' }, { status: 400 });
     }
 
     const user = await prisma.user.findFirst({
-      where: {
-        OR: [
-          { username: username },
-          { email: username }
-        ]
-      }
+      where: { OR: [{ username: username }, { email: username }] }
     });
 
     if (!user) {
-      return NextResponse.json(
-        { success: false, error: 'بيانات الدخول غير صحيحة' },
-        { status: 401 }
-      );
+      return NextResponse.json({ success: false, error: 'بيانات الدخول غير صحيحة' }, { status: 401 });
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
-      return NextResponse.json(
-        { success: false, error: 'بيانات الدخول غير صحيحة' },
-        { status: 401 }
-      );
+      return NextResponse.json({ success: false, error: 'بيانات الدخول غير صحيحة' }, { status: 401 });
     }
 
-    console.log('✅ Login successful:', username);
-
-    // 🔑 إصدار كوكيز الجلسة
     const cookieStore = await cookies();
-    cookieStore.set('session', user.id, {
+    cookieStore.set('session', String(user.id), {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 60 * 60 * 24 * 7 // أسبوع
+      secure: process.env.NODE_ENV === 'production', // true في Vercel
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7,
+      path: '/'
     });
 
-    // ✅ لا نرسل userId للعميل - الخادم هو من يحدد الهوية من الكوكيز
     return NextResponse.json({
       success: true,
       user: {
@@ -60,15 +41,11 @@ export async function POST(req: Request) {
         email: user.email,
         playerLevel: user.playerLevel,
         totalPoints: user.totalPoints,
-        streakDays: user.streakDays,
-        avatar: user.avatar
+        streakDays: user.streakDays
       }
     });
   } catch (error) {
     console.error('❌ Login error:', error);
-    return NextResponse.json(
-      { success: false, error: 'فشل في تسجيل الدخول' },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: 'فشل في تسجيل الدخول' }, { status: 500 });
   }
 }

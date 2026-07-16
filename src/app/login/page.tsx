@@ -18,7 +18,7 @@ export default function LoginPage() {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // ✅ مهم لإرسال الكوكيز مع الطلب
+        credentials: 'include', // ضروري لقبول الكوكيز
         body: JSON.stringify({ username, password })
       });
 
@@ -30,16 +30,10 @@ export default function LoginPage() {
         return;
       }
 
-      console.log('✅ Login successful');
-      
-      // ✅ لا حاجة لحفظ userId في localStorage - الخادم يدير الجلسة عبر الكوكيز
-      // الخادم أرسل كوكيز الجلسة تلقائياً عند تسجيل الدخول
-      
-      // الانتقال إلى لوحة التحكم
       router.push('/dashboard');
     } catch (err) {
       console.error('Login error:', err);
-      setError('حدث خطأ في الاتصال');
+      setError('حدث خطأ في الاتصال بالخادم');
     } finally {
       setLoading(false);
     }
@@ -68,7 +62,7 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-bold mb-2">كلمة  ههه المرور</label>
+            <label className="block text-sm font-bold mb-2">كلمة المرور</label>
             <input
               type="password"
               value={password}

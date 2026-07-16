@@ -1,83 +1,32 @@
-// prisma/seed.js
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Starting seed...');
 
-  // 1. حذف البيانات القديمة
   await prisma.userBadge.deleteMany();
   await prisma.badge.deleteMany();
   await prisma.subjectProgress.deleteMany();
   await prisma.gameResult.deleteMany();
   await prisma.question.deleteMany();
   await prisma.user.deleteMany();
-
   console.log('🗑️  Cleared old data');
 
-  // 2. إضافة الشارات الست (نفسها)
+  // ✅ تم تصحيح الألعاب هنا لتشمل فقط الألعاب الـ 8 المطبقة فعلياً
   const badges = [
-  {
-    name: 'level1_mastery',
-    displayName: 'شهادة المبتدئ',
-    description: 'أتقنت جميع المواد في المستوى 1',
-    icon: '📜',
-    gamesUnlocked: JSON.stringify(['snake', 'memory']), // الثعبان، الذاكرة
-    requiredLevel: 1,
-    isFinalBadge: false
-  },
-  {
-    name: 'level2_mastery',
-    displayName: 'شهادة المتعلم',
-    description: 'أتقنت جميع المواد في المستوى 2',
-    icon: '📜',
-    gamesUnlocked: JSON.stringify(['tictactoe', 'whack']), // إكس-أو، اضرب الخلد
-    requiredLevel: 2,
-    isFinalBadge: false
-  },
-  {
-    name: 'level3_mastery',
-    displayName: 'شهادة المجتهد',
-    description: 'أتقنت جميع المواد في المستوى 3',
-    icon: '📜',
-    gamesUnlocked: JSON.stringify(['rps', 'hangman']), // حجر-ورقة-مقص، تخمين الكلمة
-    requiredLevel: 3,
-    isFinalBadge: false
-  },
-  {
-    name: 'level4_mastery',
-    displayName: 'شهادة المتفوق',
-    description: 'أتقنت جميع المواد في المستوى 4',
-    icon: '📜',
-    gamesUnlocked: JSON.stringify(['simon', 'pong']), // سايمون، بينج بونج
-    requiredLevel: 4,
-    isFinalBadge: false
-  },
-  {
-    name: 'level5_mastery',
-    displayName: 'شهادة العبقري',
-    description: 'أتقنت جميع المواد في المستوى 5',
-    icon: '📜',
-    gamesUnlocked: JSON.stringify(['snake', 'memory', 'tictactoe', 'whack', 'rps', 'hangman', 'simon', 'pong']), // مكافأة شاملة
-    requiredLevel: 5,
-    isFinalBadge: false
-  },
-  {
-    name: 'ultimate_champion',
-    displayName: 'البطل الشامل',
-    description: 'أتقنت جميع المواد في جميع المستويات!',
-    icon: '🏆',
-    gamesUnlocked: JSON.stringify(['snake', 'memory', 'tictactoe', 'whack', 'rps', 'hangman', 'simon', 'pong']),
-    requiredLevel: 0,
-    isFinalBadge: true
-  }
-];
+    { name: 'level1_mastery', displayName: 'شهادة المبتدئ', description: 'أتقنت جميع المواد في المستوى 1', icon: '📜', gamesUnlocked: JSON.stringify(['snake', 'memory']), requiredLevel: 1, isFinalBadge: false },
+    { name: 'level2_mastery', displayName: 'شهادة المتعلم', description: 'أتقنت جميع المواد في المستوى 2', icon: '📜', gamesUnlocked: JSON.stringify(['tictactoe', 'whack']), requiredLevel: 2, isFinalBadge: false },
+    { name: 'level3_mastery', displayName: 'شهادة المجتهد', description: 'أتقنت جميع المواد في المستوى 3', icon: '📜', gamesUnlocked: JSON.stringify(['rps', 'hangman']), requiredLevel: 3, isFinalBadge: false },
+    { name: 'level4_mastery', displayName: 'شهادة المتفوق', description: 'أتقنت جميع المواد في المستوى 4', icon: '📜', gamesUnlocked: JSON.stringify(['simon', 'pong']), requiredLevel: 4, isFinalBadge: false },
+    { name: 'level5_mastery', displayName: 'شهادة العبقري', description: 'أتقنت جميع المواد في المستوى 5', icon: '📜', gamesUnlocked: JSON.stringify(['snake', 'memory', 'tictactoe', 'whack', 'rps', 'hangman', 'simon', 'pong']), requiredLevel: 5, isFinalBadge: false },
+    { name: 'ultimate_champion', displayName: 'البطل الشامل', description: 'أتقنت جميع المواد في جميع المستويات!', icon: '🏆', gamesUnlocked: JSON.stringify(['snake', 'memory', 'tictactoe', 'whack', 'rps', 'hangman', 'simon', 'pong']), requiredLevel: 0, isFinalBadge: true }
+  ];
 
   for (const badge of badges) {
     await prisma.badge.create({ data: badge });
   }
-
   console.log('✅ Created 6 badges');
+
 
   // -------------------------------------------------------------------
   // 3. الأسئلة – 20 سؤالاً لكل مادة ومستوى (المجموع 20 × 8 × 5 = 800)
