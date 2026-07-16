@@ -52,10 +52,13 @@ export async function POST(req: Request) {
       maxAge: 60 * 60 * 24 * 7 // أسبوع
     });
 
-    // ✅ لا نرسل userId للعميل - الخادم هو من يحدد الهوية من الكوكيز
+    // ✅ نُبقي id ضمن الرد لأن بقية التطبيق (9 مسارات API + صفحات العميل)
+    // لا تزال تعتمد على أن العميل يرسل userId المخزّن في localStorage.
+    // (الكوكيز أعلاه لا ضرر منها، لكنها غير مقروءة بعد في أي مكان آخر)
     return NextResponse.json({
       success: true,
       user: {
+        id: user.id,
         username: user.username,
         email: user.email,
         playerLevel: user.playerLevel,
