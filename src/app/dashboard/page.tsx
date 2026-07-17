@@ -1,45 +1,53 @@
 'use client';
-
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [userId, setUserId] = useState<string | null>(null);
+  const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [unlockedGamesCount, setUnlockedGamesCount] = useState(0);
 
   useEffect(() => {
-    const storedUserId = localStorage.getItem('userId');
-    console.log('🔍 Dashboard - userId from localStorage:', storedUserId);
-    
-    if (!storedUserId) {
-      console.warn('⚠️ No userId found, redirecting to login');
-      router.push('/login');
-      return;
-    }
+    const fetchUserData = async () => {
+      try {
+        // ✅ نستخدم credentials: 'include' لإرسال كوكيز الجلسة تلقائياً
+        const res = await fetch('/api/user/me', {
+          credentials: 'include'
+        });
 
-    setUserId(storedUserId);
-    loadUnlockedGames(storedUserId);
-    setLoading(false);
+        if (res.status === 401 || res.status === 404) {
+          // ✅ إذا كان غير مصرح أو المستخدم غير موجود، نعيد التوجيه لتسجيل الدخول
+          router.push('/login');
+          return;
+        }
+
+        const data = await res.json();
+        if (data.success) {
+          setUser(data.user);
+        } else {
+          router.push('/login');
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        router.push('/login');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
   }, [router]);
-
-  const loadUnlockedGames = async (uid: string) => {
-    try {
-      const res = await fetch(`/api/badges?userId=${uid}`);
-      const data = await res.json();
-      setUnlockedGamesCount(data.unlockedGames?.length || 0);
-    } catch (error) {
-      console.error('Error loading games:', error);
-    }
-  };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-2xl animate-pulse">جاري التحميل...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
+        <div className="text-2xl font-bold text-blue-600 animate-pulse">جاري تحميل لوحة التحكم...</div>
       </div>
     );
+  }
+
+  if (!user) {
+    return null; // سيتم إعادة التوجيه تلقائياً عبر الـ useEffect
   }
 
   return (
@@ -47,7 +55,7 @@ export default function DashboardPage() {
       <div className="max-w-6xl mx-auto">
         <div className="bg-white rounded-3xl shadow-2xl p-8 mb-6">
           <h1 className="text-4xl font-bold text-center mb-8">🎓 لوحة التحكم</h1>
-          
+          <p className="text-lg text-gray-600 text-center mb-6"></p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               { name: 'الحساب', icon: '🔢', subject: 'math' },
@@ -111,15 +119,14 @@ export default function DashboardPage() {
         </div>
 
         <div className="mt-8 text-center">
-          <button
-            onClick={() => {
-              localStorage.removeItem('userId');
-              localStorage.removeItem('username');
+         <button
+            onClick={async () => {
+              await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
               router.push('/login');
             }}
-            className="bg-red-500 text-white px-8 py-3 rounded-xl font-bold hover:bg-red-600 transition-all"
+            className="text-red-500 font-bold hover:underline"
           >
-            🚪 تسجيل الخروج
+            تسجيل الخروج
           </button>
         </div>
       </div>
