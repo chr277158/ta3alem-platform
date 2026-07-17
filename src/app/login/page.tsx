@@ -63,7 +63,7 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-bold mb-2">كلمة المرور</label>
+            <label className="block text-sm font-bold mb-2">كلمة  Gالمرور</label>
             <input
               type="password"
               value={password}
