@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import MishbakAssistant from '@/components/MishbakAssistant';
-import './components/MishbakAssistant.css';
+import '../components/MishbakAssistant.css';
 
 // ✅ تعريف الخطوط
 const geistSans = Geist({
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   description: "منصة تعليمية تفاعلية للتلاميذ التونسيين في التعليم الابتدائي",
 };
 
-// ✅ دالة RootLayout واحدة فقط (بدون تكرار)
+// ✅ دالة RootLayout واحدjة فقط (بدون تكرار)
 export default function RootLayout({
   children,
 }: Readonly<{
