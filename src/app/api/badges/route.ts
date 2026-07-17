@@ -1,14 +1,18 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { cookies } from 'next/headers';
 
 export async function GET(req: Request) {
   try {
-    const { searchParams } = new URL(req.url);
-    const userId = searchParams.get('userId');
-
-    if (!userId) {
-      return NextResponse.json({ error: 'User ID required' }, { status: 400 });
+    // 🔑 قراءة userId من الكوكيز الآمنة
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get('session');
+    
+    if (!sessionCookie) {
+      return NextResponse.json({ error: 'غير مصرح - يجب تسجيل الدخول' }, { status: 401 });
     }
+    
+    const userId = sessionCookie.value;
 
     // جلب جميع الشارات
     const allBadges = await prisma.badge.findMany();

@@ -1,17 +1,20 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { cookies } from 'next/headers';
 
-const SUBJECTS = ['math', 'science', 'body', 'environment', 
-                  'arabic', 'french', 'islamic', 'history'];
+const SUBJECTS = ['math', 'science', 'body', 'environment', 'arabic', 'french', 'islamic', 'history'];
 
 export async function GET(req: Request) {
   try {
-    const { searchParams } = new URL(req.url);
-    const userId = searchParams.get('userId');
-
-    if (!userId) {
-      return NextResponse.json({ error: 'User ID required' }, { status: 400 });
+    // 🔑 قراءة userId من الكوكيز الآمنة
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get('session');
+    
+    if (!sessionCookie) {
+      return NextResponse.json({ error: 'غير مصرح - يجب تسجيل الدخول' }, { status: 401 });
     }
+    
+    const userId = sessionCookie.value;
 
     // جلب تقدم جميع المواد
     const allProgress = await prisma.subjectProgress.findMany({
@@ -34,7 +37,6 @@ export async function GET(req: Request) {
       const masteredCount = allProgress.filter(
         p => p.level === level && p.mastered
       ).length;
-      
       if (masteredCount < SUBJECTS.length) {
         currentLevel = level;
         break;

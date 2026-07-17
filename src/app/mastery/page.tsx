@@ -1,5 +1,4 @@
 'use client';
-
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import CertificateCard from '@/components/CertificateCard';
@@ -18,31 +17,32 @@ const SUBJECTS = [
 const LEVELS_INFO = [
   { level: 1, name: 'المبتدئ', games: ['snake', 'memory'] },
   { level: 2, name: 'المتعلم', games: ['tictactoe', 'whack'] },
-  { level: 3, name: 'المجتهد', games: ['2048', 'rps'] },
-  { level: 4, name: 'المتفوق', games: ['hangman', 'simon'] },
-  { level: 5, name: 'العبقري', games: ['pong', 'breakout'] }
+  { level: 3, name: 'المجتهد', games: ['rps', 'hangman'] },
+  { level: 4, name: 'المتفوق', games: ['simon', 'pong'] },
+  { level: 5, name: 'العبقري', games: ['snake', 'memory', 'tictactoe', 'whack', 'rps', 'hangman', 'simon', 'pong'] }
 ];
 
 export default function MasteryPage() {
   const router = useRouter();
-  const [userId, setUserId] = useState<string | null>(null);
   const [currentLevel, setCurrentLevel] = useState(1);
   const [progress, setProgress] = useState<any>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedUserId = localStorage.getItem('userId');
-    if (!storedUserId) {
-      router.push('/login');
-      return;
-    }
-    setUserId(storedUserId);
-    loadProgress(storedUserId);
-  }, []);
+    loadProgress();
+  }, [router]);
 
-  const loadProgress = async (uid: string) => {
+  const loadProgress = async () => {
     try {
-      const res = await fetch(`/api/mastery/progress?userId=${uid}`);
+      const res = await fetch('/api/mastery/progress', {
+        credentials: 'include' // ✅ إرسال الكوكيز تلقائياً
+      });
+
+      if (res.status === 401) {
+        router.push('/login');
+        return;
+      }
+
       const data = await res.json();
       setProgress(data.progress || {});
       setCurrentLevel(data.currentLevel || 1);
@@ -77,28 +77,21 @@ export default function MasteryPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-6" dir="rtl">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-10 no-print">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">📜 سجل شهادات الإتقان</h1>
           <p className="text-gray-600">أكمل جميع المواد في كل مستوى للحصول على شهادتك وطباعتها!</p>
-          <button 
-            onClick={() => router.push('/dashboard')}
-            className="mt-4 bg-gray-200 text-gray-700 px-6 py-2 rounded-xl font-bold hover:bg-gray-300 transition-all"
-          >
+          <button onClick={() => router.push('/dashboard')} className="mt-4 bg-gray-200 text-gray-700 px-6 py-2 rounded-xl font-bold hover:bg-gray-300 transition-all">
             🏠 العودة للرئيسية
           </button>
         </div>
 
-        {/* عرض الشهادات */}
         <div className="space-y-12">
           {LEVELS_INFO.map((info) => {
             const masteredCount = getLevelProgress(info.level);
             const isUnlocked = info.level <= currentLevel;
             const isComplete = masteredCount === 8;
-
             return (
               <div key={info.level} className="scroll-mt-20">
-                {/* شريط التقدم للمستوى (يظهر فقط إذا لم يكتمل) */}
                 {!isComplete && isUnlocked && (
                   <div className="bg-white rounded-xl p-4 mb-6 shadow-md no-print">
                     <div className="flex justify-between items-center mb-2">
@@ -106,21 +99,13 @@ export default function MasteryPage() {
                       <span className="text-blue-600 font-bold">{masteredCount}/8 مواد مُتقنة</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div 
-                        className="bg-blue-500 h-3 rounded-full transition-all duration-700"
-                        style={{ width: `${(masteredCount / 8) * 100}%` }}
-                      ></div>
+                      <div className="bg-blue-500 h-3 rounded-full transition-all duration-700" style={{ width: `${(masteredCount / 8) * 100}%` }}></div>
                     </div>
                     <div className="mt-3 flex flex-wrap gap-2">
                       {SUBJECTS.map(sub => {
                         const status = getSubjectStatus(sub.key, info.level);
                         return (
-                          <div 
-                            key={sub.key}
-                            className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold ${
-                              status.mastered ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
-                            }`}
-                          >
+                          <div key={sub.key} className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold ${status.mastered ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
                             {sub.icon} {sub.name} {status.mastered ? '✅' : `(${status.bestScore}/5)`}
                           </div>
                         );
@@ -128,8 +113,6 @@ export default function MasteryPage() {
                     </div>
                   </div>
                 )}
-
-                {/* بطاقة الشهادة */}
                 <CertificateCard
                   level={info.level}
                   levelName={`شهادة ${info.name}`}
@@ -140,8 +123,6 @@ export default function MasteryPage() {
               </div>
             );
           })}
-
-          {/* شهادة البطل الشامل */}
           {currentLevel > 5 && (
             <div className="mt-12">
               <CertificateCard
@@ -149,7 +130,7 @@ export default function MasteryPage() {
                 levelName="🏆 شهادة البطل الشامل"
                 isUnlocked={true}
                 masteredCount={40}
-                gamesUnlocked={['maze', 'draw', 'puzzle', 'quiz']}
+                gamesUnlocked={['snake', 'memory', 'tictactoe', 'whack', 'rps', 'hangman', 'simon', 'pong']}
               />
             </div>
           )}
