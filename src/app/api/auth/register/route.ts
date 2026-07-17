@@ -1,3 +1,4 @@
+// src/app/api/auth/register/route.ts
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
@@ -37,6 +38,7 @@ export async function POST(req: Request) {
       }
     });
 
+    // ✅ نفس الحل: await + sameSite: 'lax' + path: '/'
     const cookieStore = await cookies();
     cookieStore.set('session', String(user.id), {
       httpOnly: true,
@@ -49,6 +51,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       user: {
+        id: user.id,
         username: user.username,
         email: user.email,
         playerLevel: user.playerLevel,

@@ -1,3 +1,4 @@
+// src/app/api/auth/login/route.ts
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
@@ -25,16 +26,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: 'بيانات الدخول غير صحيحة' }, { status: 401 });
     }
 
+    // ✅ الحل: استخدام await + sameSite: 'lax' + path: '/'
     const cookieStore = await cookies();
     cookieStore.set('session', String(user.id), {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // true في Vercel
-      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax', // ✅ تغيير strict إلى lax
       maxAge: 60 * 60 * 24 * 7,
-      path: '/'
+      path: '/' // ✅ إضافة path
     });
 
-    // ✅ لا نرسل userId للعميل - الخادم هو من يحدد الهوية من الكوكيز
     return NextResponse.json({
       success: true,
       user: {

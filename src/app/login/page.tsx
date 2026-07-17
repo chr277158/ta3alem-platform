@@ -18,7 +18,7 @@ export default function LoginPage() {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // ضروري لقبول الكوكيز
+        credentials: 'include', // ✅ هذا السطر ضروري جداً!
         body: JSON.stringify({ username, password })
       });
 
@@ -30,10 +30,11 @@ export default function LoginPage() {
         return;
       }
 
+      console.log('✅ Login successful');
       router.push('/dashboard');
     } catch (err) {
       console.error('Login error:', err);
-      setError('حدث خطأ في الاتصال بالخادم');
+      setError('حدث خطأ في الاتصال');
     } finally {
       setLoading(false);
     }
@@ -62,7 +63,7 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-bold mb-2">كلمة  testالمرور</label>
+            <label className="block text-sm font-bold mb-2">كلمة المرور</label>
             <input
               type="password"
               value={password}
