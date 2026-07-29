@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Environment, ContactShadows } from '@react-three/drei';
+import { ContactShadows } from '@react-three/drei';
 import { usePathname } from 'next/navigation';
 import { useMishbak, MishbakMood } from '@/context/MishbakContext';
 import { Companion3D } from './Companion3D';
@@ -16,16 +16,15 @@ export default function MishbakAssistant({ userName }: { userName?: string }) {
   const [mood, setMood] = useState<MishbakMood>('neutral');
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // قاموس الرسائل السياقية
   const contextualMessages: Record<string, { text: string; mood: MishbakMood }> = {
     '/dashboard': { 
       text: userName 
         ? `أهلاً بك يا ${userName}! ماذا سنتعلم اليوم؟ 🚀` 
-        : 'أهلاً بك يا بطل! ماذا سنتعلم اليوم؟ 🚀', 
+        : 'أهلاً بك يا بطل! ماذا سنتعلم اليوم؟ ', 
       mood: 'happy' 
     },
     '/daily': { 
-      text: 'لا تنسَ تحدي اليوم للحفاظ على سلسلة انتصاراتك! 🔥', 
+      text: 'لا تنسَ تحدي اليوم للحفاظ على سلسلة انتصاراتك! ', 
       mood: 'excited' 
     },
     '/mastery': { 
@@ -42,7 +41,6 @@ export default function MishbakAssistant({ userName }: { userName?: string }) {
     },
   };
 
-  // تحديث الرسالة تلقائياً عند تغيير الصفحة
   useEffect(() => {
     const baseRoute = '/' + pathname.split('/')[1];
     const context = contextualMessages[baseRoute] || contextualMessages['/dashboard'];
@@ -50,9 +48,8 @@ export default function MishbakAssistant({ userName }: { userName?: string }) {
     setMood(context.mood);
   }, [pathname, userName]);
 
-  // إخفاء شاشة التحميل
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoaded(true), 2500);
+    const timer = setTimeout(() => setIsLoaded(true), 1000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -62,8 +59,6 @@ export default function MishbakAssistant({ userName }: { userName?: string }) {
       'نصيحة: اقرأ السؤال جيداً قبل اختيار الإجابة 👀',
       'أنت تبلي بلاءً حسناً، استمر! 💪',
       'لا بأس من الخطأ، فهو جزء من التعلم! 🌱',
-      'جرّب تحدي اليوم لتحصل على نقاط مضاعفة! ⭐',
-      'هل تعلم أن اللعب يساعد على تثبيت المعلومات؟ 🎯',
     ];
     const tip = randomTips[Math.floor(Math.random() * randomTips.length)];
     setMessage(tip);
@@ -90,7 +85,6 @@ export default function MishbakAssistant({ userName }: { userName?: string }) {
 
   return (
     <div className="fixed bottom-0 left-2 z-40 flex flex-col items-start gap-1 w-56">
-      {/* فقاعة الرسالة */}
       <div className="bg-white/95 backdrop-blur-sm text-gray-800 px-4 py-3 rounded-2xl rounded-bl-none shadow-xl border border-blue-200 max-w-[220px] text-sm font-medium relative animate-fade-in-up">
         <p className="leading-relaxed">{message}</p>
         <button 
@@ -101,13 +95,11 @@ export default function MishbakAssistant({ userName }: { userName?: string }) {
         </button>
       </div>
 
-      {/* المشهد ثلاثي الأبعاد */}
       <div 
         className="w-56 h-56 rounded-t-2xl relative overflow-hidden cursor-pointer"
         onClick={handleCompanionClick}
         title="انقر للحصول على نصيحة!"
       >
-        {/* خلفية متدرجة */}
         <div className="absolute inset-0 bg-gradient-to-t from-blue-200/50 via-purple-100/30 to-transparent rounded-t-2xl" />
         
         {!isLoaded && (
@@ -120,28 +112,29 @@ export default function MishbakAssistant({ userName }: { userName?: string }) {
         )}
         
         <Canvas
-  camera={{ position: [0, 0, 3.5], fov: 50 }} // تم سحب الكاميرا للخلف (3.5 بدلاً من 2.5)
-  style={{ 
-    opacity: isLoaded ? 1 : 0, 
-    transition: 'opacity 0.8s ease-in-out' 
-  }}
-  gl={{ alpha: true, antialias: true }}
->
-  <ambientLight intensity={0.8} />
-  <directionalLight position={[5, 5, 5]} intensity={1} castShadow />
-  <directionalLight position={[-3, 3, -3]} intensity={0.4} color="#a78bfa" />
-  
-  <Suspense fallback={null}>
-    <Companion3D mood={mood} onClick={handleCompanionClick} />
-    <ContactShadows 
-      position={[0, -1.5, 0]} // تم تعديل موقع الظل ليتناسب مع Center
-      opacity={0.4} 
-      scale={4} 
-      blur={2.5} 
-    />
-    <Environment preset="sunset" />
-  </Suspense>
-</Canvas>
+          camera={{ position: [0, 0.3, 2], fov: 50 }}
+          style={{ 
+            opacity: isLoaded ? 1 : 0, 
+            transition: 'opacity 0.8s ease-in-out' 
+          }}
+          gl={{ alpha: true, antialias: true }}
+        >
+          <ambientLight intensity={1} />
+          <directionalLight position={[5, 5, 5]} intensity={1.5} castShadow />
+          <directionalLight position={[-3, 3, -3]} intensity={0.6} color="#a78bfa" />
+          <pointLight position={[0, 2, 0]} intensity={0.8} color="#fbbf24" />
+          
+          <Suspense fallback={null}>
+            <Companion3D mood={mood} onClick={handleCompanionClick} />
+            <ContactShadows 
+              position={[0, -0.5, 0]}
+              opacity={0.4} 
+              scale={3} 
+              blur={2.5} 
+              far={4}
+            />
+          </Suspense>
+        </Canvas>
       </div>
     </div>
   );
