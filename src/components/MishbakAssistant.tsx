@@ -84,8 +84,8 @@ export default function MishbakAssistant({ userName }: { userName?: string }) {
   }
 
   return (
-    <div className="fixed bottom-0 left-2 z-40 flex flex-col items-start gap-1 w-56">
-      <div className="bg-white/95 backdrop-blur-sm text-gray-800 px-4 py-3 rounded-2xl rounded-bl-none shadow-xl border border-blue-200 max-w-[220px] text-sm font-medium relative animate-fade-in-up">
+    <div className="fixed bottom-0 left-2 z-40 flex flex-col items-start gap-3 w-40">
+      <div className="bg-white/95 backdrop-blur-sm text-gray-800 px-4 py-3 rounded-2xl rounded-bl-none shadow-xl border border-blue-200 max-w-[160px] text-sm font-medium relative animate-fade-in-up z-10">
         <p className="leading-relaxed">{message}</p>
         <button 
           onClick={() => setIsVisible(false)}
@@ -96,7 +96,7 @@ export default function MishbakAssistant({ userName }: { userName?: string }) {
       </div>
 
       <div 
-        className="w-56 h-56 rounded-t-2xl relative overflow-hidden cursor-pointer"
+        className="w-40 h-56 rounded-t-2xl relative overflow-hidden cursor-pointer z-20"
         onClick={handleCompanionClick}
         title="انقر للحصول على نصيحة!"
       >
@@ -112,7 +112,7 @@ export default function MishbakAssistant({ userName }: { userName?: string }) {
         )}
         
         <Canvas
-          camera={{ position: [0, 0.3, 2], fov: 50 }}
+          camera={{ position: [0, 0.8, 3], fov: 40 }}
           style={{ 
             opacity: isLoaded ? 1 : 0, 
             transition: 'opacity 0.8s ease-in-out' 
@@ -127,11 +127,11 @@ export default function MishbakAssistant({ userName }: { userName?: string }) {
           <Suspense fallback={null}>
             <Companion3D mood={mood} onClick={handleCompanionClick} />
             <ContactShadows 
-              position={[0, -0.5, 0]}
+              position={[0, -0.6, 0]}
               opacity={0.4} 
-              scale={3} 
+              scale={2} 
               blur={2.5} 
-              far={4}
+              far={3}
             />
           </Suspense>
         </Canvas>

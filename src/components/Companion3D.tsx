@@ -55,7 +55,7 @@ export function Companion3D({ mood, onClick }: Companion3DProps) {
         onClick?.();
       }}
     >
-      <group ref={bodyRef} position={[0, 0, 0]}>
+      <group ref={bodyRef} position={[0, -0.08, 0]}>
         {/* الجسم */}
         <mesh position={[0, 0.3, 0]} castShadow receiveShadow>
           <boxGeometry args={[0.6, 0.7, 0.4]} />
