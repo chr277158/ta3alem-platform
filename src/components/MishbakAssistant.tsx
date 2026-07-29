@@ -32,7 +32,7 @@ export default function MishbakAssistant({ userName }: { userName?: string }) {
       mood: 'celebrating' 
     },
     '/badges': { 
-      text: 'كل شارة جديدة هي خطوة نحو الإتقان! استمر يا بطل 🏆', 
+      text: 'كل شارة جديدة هي خطوة نحو الإتقان! استمر يا بطل ', 
       mood: 'happy' 
     },
     '/games': { 
@@ -57,7 +57,7 @@ export default function MishbakAssistant({ userName }: { userName?: string }) {
     const randomTips = [
       'هل تعلم؟ المراجعة اليومية تقوي الذاكرة! 🧠',
       'نصيحة: اقرأ السؤال جيداً قبل اختيار الإجابة 👀',
-      'أنت تبلي بلاءً حسناً، استمر! 💪',
+      'أنت تبلي بلاءً حسناً، استمر! ',
       'لا بأس من الخطأ، فهو جزء من التعلم! 🌱',
     ];
     const tip = randomTips[Math.floor(Math.random() * randomTips.length)];
@@ -84,8 +84,8 @@ export default function MishbakAssistant({ userName }: { userName?: string }) {
   }
 
   return (
-    <div className="fixed bottom-0 left-2 z-40 flex flex-col items-start gap-3 w-40">
-      <div className="bg-white/95 backdrop-blur-sm text-gray-800 px-4 py-3 rounded-2xl rounded-bl-none shadow-xl border border-blue-200 max-w-[160px] text-sm font-medium relative animate-fade-in-up z-10">
+    <div className="fixed bottom-0 left-2 z-40 flex flex-col items-start gap-1 w-56">
+      <div className="bg-white/95 backdrop-blur-sm text-gray-800 px-4 py-3 rounded-2xl rounded-bl-none shadow-xl border border-blue-200 max-w-[220px] text-sm font-medium relative animate-fade-in-up">
         <p className="leading-relaxed">{message}</p>
         <button 
           onClick={() => setIsVisible(false)}
@@ -96,7 +96,7 @@ export default function MishbakAssistant({ userName }: { userName?: string }) {
       </div>
 
       <div 
-        className="w-40 h-56 rounded-t-2xl relative overflow-hidden cursor-pointer z-20"
+        className="w-56 h-56 rounded-t-2xl relative overflow-hidden cursor-pointer"
         onClick={handleCompanionClick}
         title="انقر للحصول على نصيحة!"
       >
@@ -112,26 +112,26 @@ export default function MishbakAssistant({ userName }: { userName?: string }) {
         )}
         
         <Canvas
-          camera={{ position: [0, 0.8, 3], fov: 40 }}
+          camera={{ position: [0, 0.5, 2.5], fov: 50 }}
           style={{ 
             opacity: isLoaded ? 1 : 0, 
             transition: 'opacity 0.8s ease-in-out' 
           }}
           gl={{ alpha: true, antialias: true }}
         >
-          <ambientLight intensity={1} />
-          <directionalLight position={[5, 5, 5]} intensity={1.5} castShadow />
-          <directionalLight position={[-3, 3, -3]} intensity={0.6} color="#a78bfa" />
-          <pointLight position={[0, 2, 0]} intensity={0.8} color="#fbbf24" />
+          <ambientLight intensity={1.2} />
+          <directionalLight position={[5, 5, 5]} intensity={1.8} castShadow />
+          <directionalLight position={[-3, 3, -3]} intensity={0.8} color="#a78bfa" />
+          <pointLight position={[0, 3, 2]} intensity={1} color="#fbbf24" />
           
           <Suspense fallback={null}>
             <Companion3D mood={mood} onClick={handleCompanionClick} />
             <ContactShadows 
-              position={[0, -0.6, 0]}
-              opacity={0.4} 
-              scale={2} 
-              blur={2.5} 
-              far={3}
+              position={[0, -1.2, 0]}
+              opacity={0.5} 
+              scale={4} 
+              blur={3} 
+              far={5}
             />
           </Suspense>
         </Canvas>
