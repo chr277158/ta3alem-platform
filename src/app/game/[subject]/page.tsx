@@ -1,267 +1,211 @@
 'use client';
-import { useEffect, useState, use, useRef } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import CelebrationModal from '@/components/CelebrationModal';
-import { playSound } from '@/lib/sounds';
-import Companion3D from '@/components/Companion3D';
-'use client';
+
+import { useState, useEffect, useRef } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 import { useMishbak } from '@/context/MishbakContext';
 
-export default function GamePage() {
-  const { showMessage } = useMishbak();
-
-  const handleAnswer = (isCorrect: boolean) => {
-    if (isCorrect) {
-      showMessage('أحسنت! إجابة رائعة وممتازة 🌟', 'celebrating', 3000);
-      // منطق إضافة النقاط...
-    } else {
-      showMessage('لا تيأس! الخطأ جزء من التعلم، حاول مرة أخرى 💪', 'encouraging', 4000);
-      // منطق خصم المحاولات...
-    }
-  };
-
-  return (
-    // ... واجهة اللعبة
-    <button onClick={() => handleAnswer(true)}>إجابة صحيحة (للاختبار)</button>
-    <button onClick={() => handleAnswer(false)}>إجابة خاطئة (للاختبار)</button>
-  );
-}
 interface Question {
   id: string;
   question: string;
   options: string[];
-  correctAnswer: number;
-  explanation: string;
+  correctAnswer: string;
+  explanation?: string;
 }
 
-export default function GamePage({ params }: { params: Promise<{ subject: string }> }) {
+export default function GamePage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const { subject } = use(params);
-  const level = parseInt(searchParams.get('level') || '1');
-
-  const [companionMood, setCompanionMood] = useState<'happy' | 'neutral' | 'sad'>('neutral');
-  const [userAvatar, setUserAvatar] = useState('robot');
+  const params = useParams();
+  const subject = params.subject as string;
+  const { showMessage } = useMishbak();
+  
+  const [user, setUser] = useState<any>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [hearts, setHearts] = useState(3);
-  const [showExplanation, setShowExplanation] = useState(false);
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [gameOver, setGameOver] = useState(false);
-  const [showCelebration, setShowCelebration] = useState(false);
-  const [newBadges, setNewBadges] = useState<any[]>([]);
-  const [pointsEarned, setPointsEarned] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const scoreRef = useRef(0);
-  const heartsRef = useRef(3);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [showExplanation, setShowExplanation] = useState(false);
+  
+  const scoreRef = useRef(score);
+  const heartsRef = useRef(hearts);
+  
+  useEffect(() => {
+    scoreRef.current = score;
+  }, [score]);
+  
+  useEffect(() => {
+    heartsRef.current = hearts;
+  }, [hearts]);
 
   useEffect(() => {
-    const storedAvatar = localStorage.getItem('userAvatar');
-    if (storedAvatar) setUserAvatar(storedAvatar);
-  }, []);
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/user/me', { credentials: 'include' });
+        if (res.status === 401) {
+          router.push('/login');
+          return;
+        }
+        const data = await res.json();
+        if (data.success) {
+          setUser(data.user);
+          await fetchQuestions();
+        }
+      } catch (error) {
+        console.error('خطأ في التحقق:', error);
+        router.push('/login');
+      }
+    };
+    
+    checkAuth();
+  }, [router]);
 
-  useEffect(() => {
-    loadQuestions();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [subject, level]);
-
-  const loadQuestions = async () => {
+  const fetchQuestions = async () => {
     try {
-      setLoading(true);
-      setError(null);
-      
-      const url = `/api/game/questions?subject=${subject}&level=${level}`;
-      const res = await fetch(url, {
-        credentials: 'include' // ضروري لإرسال الكوكيز
+      const res = await fetch(`/api/game/questions?subject=${subject}`, {
+        credentials: 'include'
       });
-      
-      if (res.status === 401) {
-        setError('يجب تسجيل الدخول أولاً');
-        setTimeout(() => router.push('/login'), 2000);
-        return;
-      }
-      
-      if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-      
       const data = await res.json();
-      
-      if (!data.questions || data.questions.length === 0) {
-        setError('لا توجد أسئلة متاحة لهذا المستوى');
-        setLoading(false);
-        return;
+      if (data.success) {
+        setQuestions(data.questions);
       }
-      
-      setQuestions(data.questions);
       setLoading(false);
     } catch (error) {
-      console.error('❌ Error loading questions:', error);
-      setError(`فشل تحميل الأسئلة: ${error instanceof Error ? error.message : 'خطأ غير معروف'}`);
+      console.error('خطأ في جلب الأسئلة:', error);
       setLoading(false);
     }
   };
 
-  const handleAnswer = async (answerIndex: number) => {
-    if (showExplanation) return;
+  const handleAnswer = async (answer: string) => {
+    if (selectedAnswer) return;
     
-    setSelectedAnswer(answerIndex);
-    setShowExplanation(true);
-    
-    const isCorrect = answerIndex === questions[currentQuestion].correctAnswer;
+    setSelectedAnswer(answer);
+    const currentQuestion = questions[currentQuestionIndex];
+    const isCorrect = answer === currentQuestion.correctAnswer;
     
     if (isCorrect) {
-      setScore(prev => {
-        scoreRef.current = prev + 1;
-        return prev + 1;
-      });
-      setCompanionMood('happy');
-      playSound('correct');
+      setScore(prev => prev + 10);
+      showMessage('أحسنت! إجابة رائعة وممتازة 🌟', 'celebrating', 3000);
     } else {
-      setHearts(prev => {
-        heartsRef.current = prev - 1;
-        return prev - 1;
-      });
-      setCompanionMood('sad');
-      playSound('wrong');
+      setHearts(prev => prev - 1);
+      showMessage('لا تيأس! الخطأ جزء من التعلم 💪', 'encouraging', 4000);
     }
-
-    setTimeout(() => {
-      setCompanionMood('neutral');
-      if (currentQuestion < questions.length - 1 && heartsRef.current > 0) {
-        setCurrentQuestion(prev => prev + 1);
-        setShowExplanation(false);
+    
+    setShowExplanation(true);
+    
+    setTimeout(async () => {
+      if (heartsRef.current <= 1 && !isCorrect) {
+        await finishGame();
+      } else if (currentQuestionIndex < questions.length - 1) {
+        setCurrentQuestionIndex(prev => prev + 1);
         setSelectedAnswer(null);
+        setShowExplanation(false);
       } else {
-        finishGame(scoreRef.current);
+        await finishGame();
       }
-    }, 3000);
+    }, 2000);
   };
 
-  const finishGame = async (finalScore: number) => {
-    console.log(`🏁 Finishing game with score: ${finalScore}/5`);
-    setGameOver(true);
-    
+  const finishGame = async () => {
     try {
-      const res = await fetch('/api/game/finish', {
+      await fetch('/api/game/finish', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // ضروري لإرسال الكوكيز
+        credentials: 'include',
         body: JSON.stringify({
           subject,
-          level,
-          score: finalScore,
-          totalQuestions: questions.length,
-          heartsLost: 3 - heartsRef.current,
-          hintsUsed: 0
+          score: scoreRef.current,
+          heartsLost: 3 - heartsRef.current
         })
       });
-      
-      const data = await res.json();
-      if (data.newBadges && data.newBadges.length > 0) {
-        setNewBadges(data.newBadges);
-        setPointsEarned(data.pointsEarned || 0);
-        setShowCelebration(true);
-        playSound('achievement');
-      }
+      router.push('/dashboard');
     } catch (error) {
-      console.error('Error finishing game:', error);
+      console.error('خطأ في إنهاء اللعبة:', error);
     }
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="text-2xl animate-pulse">جاري تحميل الأسئلة...</div></div>;
-
-  if (error) {
+  if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-6" dir="rtl">
-        <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center">
-          <div className="text-6xl mb-4">⚠️</div>
-          <h2 className="text-2xl font-bold mb-4">حدث خطأ</h2>
-          <p className="text-gray-600 mb-6">{error}</p>
-          <div className="space-y-3">
-            <button onClick={() => { setError(null); loadQuestions(); }} className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700">🔄 إعادة المحاولة</button>
-            <button onClick={() => router.push('/dashboard')} className="w-full bg-gray-200 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-300">🏠 العودة للرئيسية</button>
-          </div>
-        </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-xl font-bold">جاري تحميل الأسئلة...</p>
       </div>
     );
   }
 
-  if (gameOver) {
+  if (questions.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-6" dir="rtl">
-        <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center animate-bounce-in">
-          <div className="text-6xl mb-4">{scoreRef.current === 5 ? '🏆' : scoreRef.current >= 3 ? '🎉' : '💪'}</div>
-          <h2 className="text-3xl font-bold mb-4">{scoreRef.current === 5 ? 'ممتاز!' : scoreRef.current >= 3 ? 'أحسنت!' : 'حاول مرة أخرى'}</h2>
-          <div className="text-5xl font-bold text-blue-600 mb-2">{scoreRef.current}/{questions.length}</div>
-          <p className="text-gray-600 mb-6">{scoreRef.current === 5 ? 'لقد أتقنت هذه المادة!' : 'استمر في المحاولة'}</p>
-          <div className="space-y-3">
-            <button onClick={() => router.push('/mastery')} className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-xl font-bold hover:from-purple-700 hover:to-pink-700 transition-all">📜 عرض الشهادات</button>
-            <button onClick={() => router.push('/dashboard')} className="w-full bg-gray-200 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-300 transition-all">🏠 العودة للرئيسية</button>
-          </div>
-        </div>
-        <CelebrationModal isOpen={showCelebration} onClose={() => setShowCelebration(false)} badges={newBadges} pointsEarned={pointsEarned} />
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-xl font-bold">لا توجد أسئلة متاحة</p>
       </div>
     );
   }
 
-  const question = questions[currentQuestion];
+  const currentQuestion = questions[currentQuestionIndex];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-6" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-4" dir="rtl">
       <div className="max-w-2xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-lg p-4 mb-6 relative">
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex gap-1">
-              {[...Array(3)].map((_, i) => (
-                <span key={i} className={`text-3xl ${i < heartsRef.current ? '' : 'opacity-30'}`}>❤️</span>
-              ))}
-            </div>
-            {/* تم إصلاح التعليق هنا ليكون متوافقاً مع قواعد JSX */}
-            <div className="absolute top-4 left-4 z-20">
-              <Companion3D avatarType={userAvatar} mood={companionMood} />
-            </div>
-            <div className="text-2xl font-bold text-blue-600">{scoreRef.current}/{questions.length}</div>
+        {/* شريط المعلومات */}
+        <div className="flex justify-between items-center mb-6 bg-white rounded-xl p-4 shadow-md">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">❤️</span>
+            <span className="text-xl font-bold">{hearts}</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-3">
-            <div className="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full transition-all duration-500" style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}></div>
+          <div className="text-center">
+            <p className="text-sm text-gray-600">السؤال</p>
+            <p className="text-lg font-bold">{currentQuestionIndex + 1} / {questions.length}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xl font-bold">{score}</span>
+            <span className="text-2xl">⭐</span>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 animate-fadeInUp">
-          <div className="text-sm text-gray-500 mb-2">السؤال {currentQuestion + 1} من {questions.length}</div>
-          <h2 className="text-2xl font-bold mb-6">{question.question}</h2>
+        {/* السؤال */}
+        <div className="bg-white rounded-xl p-6 shadow-lg mb-6">
+          <h2 className="text-2xl font-bold mb-6 text-center">{currentQuestion.question}</h2>
+          
           <div className="space-y-3">
-            {question.options.map((option, index) => {
-              const isSelected = selectedAnswer === index;
-              const isCorrect = index === question.correctAnswer;
-              let buttonClass = 'bg-gray-100 hover:bg-gray-200';
-              if (showExplanation) {
-                if (isCorrect) buttonClass = 'bg-green-500 text-white';
-                else if (isSelected && !isCorrect) buttonClass = 'bg-red-500 text-white';
-                else buttonClass = 'bg-gray-100 opacity-50';
+            {currentQuestion.options.map((option, index) => {
+              const isSelected = selectedAnswer === option;
+              const isCorrect = option === currentQuestion.correctAnswer;
+              const showResult = selectedAnswer !== null;
+              
+              let buttonClass = "w-full p-4 rounded-lg text-right font-medium transition-all ";
+              
+              if (showResult) {
+                if (isCorrect) {
+                  buttonClass += "bg-green-500 text-white";
+                } else if (isSelected) {
+                  buttonClass += "bg-red-500 text-white";
+                } else {
+                  buttonClass += "bg-gray-100 text-gray-700";
+                }
+              } else {
+                buttonClass += "bg-blue-100 hover:bg-blue-200 text-gray-800";
               }
+              
               return (
-                <button key={index} onClick={() => handleAnswer(index)} disabled={showExplanation} className={`w-full p-4 rounded-xl font-bold text-right transition-all ${buttonClass}`}>
+                <button
+                  key={index}
+                  onClick={() => handleAnswer(option)}
+                  disabled={selectedAnswer !== null}
+                  className={buttonClass}
+                >
                   {option}
                 </button>
               );
             })}
           </div>
-        </div>
 
-        {showExplanation && (
-          <div className="bg-blue-50 border-2 border-blue-500 rounded-2xl p-6 animate-fadeInUp">
-            <div className="flex items-start gap-3">
-              <div className="text-3xl">💡</div>
-              <div>
-                <h3 className="font-bold text-lg mb-2">الشرح:</h3>
-                <p className="text-gray-700">{question.explanation}</p>
-              </div>
+          {/* الشرح */}
+          {showExplanation && currentQuestion.explanation && (
+            <div className="mt-6 p-4 bg-yellow-50 border-r-4 border-yellow-400 rounded">
+              <p className="font-bold text-yellow-800 mb-2">💡 الشرح:</p>
+              <p className="text-yellow-700">{currentQuestion.explanation}</p>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

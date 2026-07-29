@@ -36,7 +36,7 @@ export default function RootLayout({
       <MishbakProvider>
         {/* محتوى التطبيق */}
         {children}
-        <MishbakAssistant userName={/* يمكن تمرين اسم المستخدم هنا إذا كان متاحاً في layout */} />
+        <MishbakAssistant userName="" />
       </MishbakProvider>
     </body>
   </html>
