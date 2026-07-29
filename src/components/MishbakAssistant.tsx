@@ -120,28 +120,28 @@ export default function MishbakAssistant({ userName }: { userName?: string }) {
         )}
         
         <Canvas
-          camera={{ position: [0, 0.5, 2.5], fov: 45 }}
-          style={{ 
-            opacity: isLoaded ? 1 : 0, 
-            transition: 'opacity 0.8s ease-in-out' 
-          }}
-          gl={{ alpha: true, antialias: true }}
-        >
-          <ambientLight intensity={0.7} />
-          <directionalLight position={[5, 5, 5]} intensity={1} castShadow />
-          <directionalLight position={[-3, 3, -3]} intensity={0.4} color="#a78bfa" />
-          
-          <Suspense fallback={null}>
-            <Companion3D mood={mood} onClick={handleCompanionClick} />
-            <ContactShadows 
-              position={[0, -0.79, 0]} 
-              opacity={0.4} 
-              scale={3} 
-              blur={2} 
-            />
-            <Environment preset="sunset" />
-          </Suspense>
-        </Canvas>
+  camera={{ position: [0, 0, 3.5], fov: 50 }} // تم سحب الكاميرا للخلف (3.5 بدلاً من 2.5)
+  style={{ 
+    opacity: isLoaded ? 1 : 0, 
+    transition: 'opacity 0.8s ease-in-out' 
+  }}
+  gl={{ alpha: true, antialias: true }}
+>
+  <ambientLight intensity={0.8} />
+  <directionalLight position={[5, 5, 5]} intensity={1} castShadow />
+  <directionalLight position={[-3, 3, -3]} intensity={0.4} color="#a78bfa" />
+  
+  <Suspense fallback={null}>
+    <Companion3D mood={mood} onClick={handleCompanionClick} />
+    <ContactShadows 
+      position={[0, -1.5, 0]} // تم تعديل موقع الظل ليتناسب مع Center
+      opacity={0.4} 
+      scale={4} 
+      blur={2.5} 
+    />
+    <Environment preset="sunset" />
+  </Suspense>
+</Canvas>
       </div>
     </div>
   );
