@@ -1,20 +1,8 @@
 
 import { MishbakProvider } from '@/context/MishbakContext';
+import { Metadata } from 'next';
 import KidMishbakAssistant from '@/components/KidMishbakAssistant';
-import { GeistSans } from 'geist/font/sans';
-import { GeistMono } from 'geist/font/mono';
 import '@/app/globals.css';
-
-// ✅ تعريف الخطوط
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 // ✅ بيانات الموقع (Metadata)
 export const metadata: Metadata = {
@@ -30,7 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ar" dir="rtl">
-      <body className={`${GeistSans.variable} ${GeistMono.variable}`}>
+      <body>
         <MishbakProvider>
           {children}
           <KidMishbakAssistant />
