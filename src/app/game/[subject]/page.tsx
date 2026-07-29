@@ -4,7 +4,28 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import CelebrationModal from '@/components/CelebrationModal';
 import { playSound } from '@/lib/sounds';
 import Companion3D from '@/components/Companion3D';
+'use client';
+import { useMishbak } from '@/context/MishbakContext';
 
+export default function GamePage() {
+  const { showMessage } = useMishbak();
+
+  const handleAnswer = (isCorrect: boolean) => {
+    if (isCorrect) {
+      showMessage('أحسنت! إجابة رائعة وممتازة 🌟', 'celebrating', 3000);
+      // منطق إضافة النقاط...
+    } else {
+      showMessage('لا تيأس! الخطأ جزء من التعلم، حاول مرة أخرى 💪', 'encouraging', 4000);
+      // منطق خصم المحاولات...
+    }
+  };
+
+  return (
+    // ... واجهة اللعبة
+    <button onClick={() => handleAnswer(true)}>إجابة صحيحة (للاختبار)</button>
+    <button onClick={() => handleAnswer(false)}>إجابة خاطئة (للاختبار)</button>
+  );
+}
 interface Question {
   id: string;
   question: string;

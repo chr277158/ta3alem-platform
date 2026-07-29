@@ -3,6 +3,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { MishbakProvider } from '@/context/MishbakContext';
 import MishbakAssistant from '@/components/MishbakAssistant';
 import '../components/MishbakAssistant.css';
 
@@ -30,11 +31,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ar" dir="rtl">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+  <html lang="ar" dir="rtl">
+    <body className={geistSans.className}>
+      <MishbakProvider>
+        {/* محتوى التطبيق */}
         {children}
-        <MishbakAssistant />
-      </body>
-    </html>
-  );
+        <MishbakAssistant userName={/* يمكن تمرين اسم المستخدم هنا إذا كان متاحاً في layout */} />
+      </MishbakProvider>
+    </body>
+  </html>
+);
 }
