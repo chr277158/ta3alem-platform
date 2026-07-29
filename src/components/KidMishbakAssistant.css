@@ -1,0 +1,93 @@
+/* ===== فقاعة الكلام المخصصة للأطفال ===== */
+/* أكبر، أكثر استدارة، وبألوان مبهجة تسهّل القراءة والتفاعل */
+.kid-speech-bubble {
+  position: relative;
+  max-width: 190px;
+  padding: 14px 18px;
+  border-radius: 26px 26px 26px 6px;
+  background: #ffffff;
+  border: 3px solid #fcd34d;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12), 0 0 0 4px rgba(252, 211, 77, 0.15);
+  animation: kidBubbleIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 10;
+}
+
+.kid-speech-text {
+  font-size: 16px;
+  line-height: 1.6;
+  font-weight: 700;
+  color: #3b3552;
+  letter-spacing: 0.2px;
+  margin: 0;
+}
+
+.kid-close-btn {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  width: 26px;
+  height: 26px;
+  border-radius: 9999px;
+  background: #ff8fa3;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 700;
+  border: 2px solid #ffffff;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  transition: transform 0.15s ease;
+}
+
+.kid-close-btn:hover {
+  transform: scale(1.15);
+}
+
+.kid-close-btn:active {
+  transform: scale(0.9);
+}
+
+/* زر إعادة إظهار المساعد بعد إخفائه */
+.kid-reopen-btn {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  z-index: 50;
+  background: linear-gradient(135deg, #ffd873, #ff9ec7);
+  color: #ffffff;
+  padding: 14px;
+  border-radius: 9999px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+  transition: transform 0.25s ease;
+}
+
+.kid-reopen-btn:hover {
+  transform: scale(1.12) rotate(-6deg);
+}
+
+/* دخول الفقاعة بارتداد لطيف بدل ظهور مسطح — أكثر مرحاً للأطفال */
+@keyframes kidBubbleIn {
+  0% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.85);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(-3px) scale(1.03);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* احترام تفضيل تقليل الحركة لدى بعض المستخدمين */
+@media (prefers-reduced-motion: reduce) {
+  .kid-speech-bubble {
+    animation: none;
+  }
+  .kid-reopen-btn:hover {
+    transform: none;
+  }
+}

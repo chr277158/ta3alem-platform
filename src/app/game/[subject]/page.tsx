@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { useMishbak } from '@/context/MishbakContext';
+import { useGameCompanion } from '@/hooks/useGameCompanion';
 
 interface Question {
   id: string;
@@ -16,8 +16,8 @@ export default function GamePage() {
   const router = useRouter();
   const params = useParams();
   const subject = params.subject as string;
-  const { showMessage } = useMishbak();
-  
+  const companion = useGameCompanion();
+
   const [user, setUser] = useState<any>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -26,14 +26,14 @@ export default function GamePage() {
   const [loading, setLoading] = useState(true);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
-  
+
   const scoreRef = useRef(score);
   const heartsRef = useRef(hearts);
-  
+
   useEffect(() => {
     scoreRef.current = score;
   }, [score]);
-  
+
   useEffect(() => {
     heartsRef.current = hearts;
   }, [hearts]);
@@ -56,14 +56,14 @@ export default function GamePage() {
         router.push('/login');
       }
     };
-    
+
     checkAuth();
   }, [router]);
 
   const fetchQuestions = async () => {
     try {
       const res = await fetch(`/api/game/questions?subject=${subject}`, {
-        credentials: 'include'
+        credentials: 'include',
       });
       const data = await res.json();
       if (data.success) {
@@ -78,26 +78,31 @@ export default function GamePage() {
 
   const handleAnswer = async (answer: string) => {
     if (selectedAnswer) return;
-    
+
     setSelectedAnswer(answer);
     const currentQuestion = questions[currentQuestionIndex];
     const isCorrect = answer === currentQuestion.correctAnswer;
-    
+
     if (isCorrect) {
-      setScore(prev => prev + 10);
-      showMessage('أحسنت! إجابة رائعة وممتازة 🌟', 'celebrating', 3000);
+      setScore((prev) => prev + 10);
+      companion.celebrateCorrectAnswer();
     } else {
-      setHearts(prev => prev - 1);
-      showMessage('لا تيأس! الخطأ جزء من التعلم 💪', 'encouraging', 4000);
+      setHearts((prev) => prev - 1);
+      companion.encourageWrongAnswer();
+
+      // تحذير عند نفاذ المحاولات
+      if (heartsRef.current - 1 <= 1) {
+        companion.warnLowHearts(heartsRef.current - 1);
+      }
     }
-    
+
     setShowExplanation(true);
-    
+
     setTimeout(async () => {
       if (heartsRef.current <= 1 && !isCorrect) {
         await finishGame();
       } else if (currentQuestionIndex < questions.length - 1) {
-        setCurrentQuestionIndex(prev => prev + 1);
+        setCurrentQuestionIndex((prev) => prev + 1);
         setSelectedAnswer(null);
         setShowExplanation(false);
       } else {
@@ -115,10 +120,21 @@ export default function GamePage() {
         body: JSON.stringify({
           subject,
           score: scoreRef.current,
-          heartsLost: 3 - heartsRef.current
-        })
+          heartsLost: 3 - heartsRef.current,
+        }),
       });
-      router.push('/dashboard');
+
+      // احتفال عند إنهاء اللعبة بنجاح
+      if (scoreRef.current >= 50) {
+        companion.celebrateLevelComplete(scoreRef.current);
+      } else {
+        companion.encourageContinue();
+      }
+
+      // تأخير بسيط قبل الانتقال للسماح بالاحتفال
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 1500);
     } catch (error) {
       console.error('خطأ في إنهاء اللعبة:', error);
     }
@@ -153,7 +169,9 @@ export default function GamePage() {
           </div>
           <div className="text-center">
             <p className="text-sm text-gray-600">السؤال</p>
-            <p className="text-lg font-bold">{currentQuestionIndex + 1} / {questions.length}</p>
+            <p className="text-lg font-bold">
+              {currentQuestionIndex + 1} / {questions.length}
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xl font-bold">{score}</span>
@@ -164,27 +182,28 @@ export default function GamePage() {
         {/* السؤال */}
         <div className="bg-white rounded-xl p-6 shadow-lg mb-6">
           <h2 className="text-2xl font-bold mb-6 text-center">{currentQuestion.question}</h2>
-          
+
           <div className="space-y-3">
             {currentQuestion.options.map((option, index) => {
               const isSelected = selectedAnswer === option;
               const isCorrect = option === currentQuestion.correctAnswer;
               const showResult = selectedAnswer !== null;
-              
-              let buttonClass = "w-full p-4 rounded-lg text-right font-medium transition-all ";
-              
+
+              let buttonClass =
+                'w-full p-4 rounded-lg text-right font-medium transition-all ';
+
               if (showResult) {
                 if (isCorrect) {
-                  buttonClass += "bg-green-500 text-white";
+                  buttonClass += 'bg-green-500 text-white';
                 } else if (isSelected) {
-                  buttonClass += "bg-red-500 text-white";
+                  buttonClass += 'bg-red-500 text-white';
                 } else {
-                  buttonClass += "bg-gray-100 text-gray-700";
+                  buttonClass += 'bg-gray-100 text-gray-700';
                 }
               } else {
-                buttonClass += "bg-blue-100 hover:bg-blue-200 text-gray-800";
+                buttonClass += 'bg-blue-100 hover:bg-blue-200 text-gray-800';
               }
-              
+
               return (
                 <button
                   key={index}
