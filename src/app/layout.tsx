@@ -1,16 +1,14 @@
-
 import { MishbakProvider } from '@/context/MishbakContext';
-import { Metadata } from 'next';
 import KidMishbakAssistant from '@/components/KidMishbakAssistant';
+import { GeistSans } from 'geist/font/sans';
+import { GeistMono } from 'geist/font/mono';
 import '@/app/globals.css';
 
-// ✅ بيانات الموقع (Metadata)
-export const metadata: Metadata = {
-  title: "تعلّم وألعب! - Ta3alem",
-  description: "منصة تعليمية تفاعلية للتلاميذ التونسيين في التعليم الابتدائي",
+export const metadata = {
+  title: 'تعلّم وألعب! - Ta3alem',
+  description: 'منصة تعليمية تفاعلية للتلاميذ التونسيين',
 };
 
-// ✅ دالة RootLayout واحدjة فقط (بدون تكرار)
 export default function RootLayout({
   children,
 }: {
@@ -18,7 +16,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ar" dir="rtl">
-      <body>
+      <body className={`${GeistSans.variable} ${GeistMono.variable}`}>
         <MishbakProvider>
           {children}
           <KidMishbakAssistant />
@@ -27,5 +25,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-

@@ -1,15 +1,9 @@
 'use client';
 
-import { useContext } from 'react';
-import { MishbakContext } from '@/context/MishbakContext';
-
-type MishbakContextValue = {
-  showMessage: (message: string, mood: string, duration: number) => void;
-  setMood: (mood: string) => void;
-};
+import { useMishbak } from '@/context/MishbakContext';
 
 export function useGameCompanion() {
-  const context = useContext(MishbakContext) as MishbakContextValue | null;
+  const context = useMishbak();
 
   if (!context) {
     throw new Error('useGameCompanion must be used within MishbakProvider');

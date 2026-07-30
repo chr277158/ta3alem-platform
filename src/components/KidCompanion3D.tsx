@@ -16,6 +16,9 @@ export type KidCompanionMood =
 interface KidCompanion3DProps {
   mood: KidCompanionMood;
   onClick?: () => void;
+  allowDrag?: boolean;
+  onPositionChange?: (pos: [number, number, number]) => void;
+  initialPosition?: [number, number, number];
 }
 
 // لوحة ألوان دافئة وناعمة، بعيدة عن الألوان المعدنية أو الحادة — مناسبة لعيون الأطفال
@@ -29,7 +32,13 @@ const MOOD_COLORS: Record<KidCompanionMood, { body: string; glow: string; blush:
   listening: { body: '#7FD8D8', glow: '#4FB8B8', blush: '#B8F0EA' },
 };
 
-export function KidCompanion3D({ mood, onClick }: KidCompanion3DProps) {
+export function KidCompanion3D({
+  mood,
+  onClick,
+  allowDrag = true,
+  onPositionChange,
+  initialPosition,
+}: KidCompanion3DProps) {
   const groupRef = useRef<THREE.Group>(null);
   const headRef = useRef<THREE.Group>(null);
   const leftArmRef = useRef<THREE.Mesh>(null);
@@ -40,6 +49,11 @@ export function KidCompanion3D({ mood, onClick }: KidCompanion3DProps) {
   const sparkleRefs = useRef<THREE.Mesh[]>([]);
   const { camera, gl } = useThree();
   const mouseRef = useRef({ x: 0, y: 0 });
+  const draggingRef = useRef(false);
+  const dragOffsetRef = useRef(new THREE.Vector3());
+  const raycasterRef = useRef(new THREE.Raycaster());
+  const planeRef = useRef(new THREE.Plane(new THREE.Vector3(0, 1, 0), 0));
+  const boundsRef = useRef({ minX: -Infinity, maxX: Infinity, minZ: -Infinity, maxZ: Infinity });
 
   // تتبع حركة الماوس لجعل العيون تنظر نحو المؤشر
   useEffect(() => {
@@ -55,6 +69,168 @@ export function KidCompanion3D({ mood, onClick }: KidCompanion3DProps) {
       gl.domElement.removeEventListener('mousemove', handleMouseMove);
     };
   }, [gl.domElement]);
+
+  // appliquer la position initiale si fournie
+  useEffect(() => {
+    if (groupRef.current && initialPosition) {
+      groupRef.current.position.set(
+        initialPosition[0],
+        initialPosition[1],
+        initialPosition[2]
+      );
+    }
+  }, [initialPosition]);
+
+  // Gestion du drag par pointeur (déplacement sur le plan XZ)
+  const handlePointerDown = (e: any) => {
+    if (!allowDrag) return;
+    e.stopPropagation();
+    draggingRef.current = true;
+    const point: THREE.Vector3 = e.point;
+    if (groupRef.current && point) {
+      dragOffsetRef.current.copy(groupRef.current.position).sub(point);
+    } else if (groupRef.current) {
+      // fallback: project mouse to plane
+      const rect = gl.domElement.getBoundingClientRect();
+      const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      const ny = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      raycasterRef.current.setFromCamera(new THREE.Vector2(nx, ny), camera);
+      const planeY = groupRef.current.position.y;
+      planeRef.current.set(new THREE.Vector3(0, 1, 0), -planeY);
+      const intersect = new THREE.Vector3();
+      raycasterRef.current.ray.intersectPlane(planeRef.current, intersect);
+      dragOffsetRef.current.copy(groupRef.current.position).sub(intersect);
+    }
+    gl.domElement.style.cursor = 'grabbing';
+
+    // attach global listeners so dragging continues off-canvas
+    window.addEventListener('pointermove', onWindowPointerMove);
+    window.addEventListener('pointerup', onWindowPointerUp);
+  };
+
+  const handlePointerMove = (e: any) => {
+    if (!draggingRef.current) return;
+    e.stopPropagation();
+    const point: THREE.Vector3 = e.point;
+    if (groupRef.current) {
+      let nx = point.x + dragOffsetRef.current.x;
+      // garder la même hauteur Y
+      let nz = point.z + dragOffsetRef.current.z;
+      [nx, nz] = clampToBounds(nx, nz);
+      groupRef.current.position.x = nx;
+      groupRef.current.position.z = nz;
+      onPositionChange?.([
+        groupRef.current.position.x,
+        groupRef.current.position.y,
+        groupRef.current.position.z,
+      ]);
+    }
+  };
+
+  const handlePointerUp = (e: any) => {
+    if (!allowDrag) return;
+    draggingRef.current = false;
+    gl.domElement.style.cursor = 'auto';
+    // remove global listeners
+    window.removeEventListener('pointermove', onWindowPointerMove);
+    window.removeEventListener('pointerup', onWindowPointerUp);
+  };
+
+  const handlePointerOver = (e: any) => {
+    if (!allowDrag) return;
+    if (!draggingRef.current) gl.domElement.style.cursor = 'grab';
+  };
+
+  const handlePointerOut = (e: any) => {
+    if (!allowDrag) return;
+    if (!draggingRef.current) gl.domElement.style.cursor = 'auto';
+  };
+
+  // helper: project client coords to world point on avatar's Y plane
+  const getPointFromClient = (clientX: number, clientY: number) => {
+    const rect = gl.domElement.getBoundingClientRect();
+    const nx = ((clientX - rect.left) / rect.width) * 2 - 1;
+    const ny = -((clientY - rect.top) / rect.height) * 2 + 1;
+    raycasterRef.current.setFromCamera(new THREE.Vector2(nx, ny), camera);
+    const planeY = groupRef.current ? groupRef.current.position.y : 0;
+    planeRef.current.set(new THREE.Vector3(0, 1, 0), -planeY);
+    const intersect = new THREE.Vector3();
+    raycasterRef.current.ray.intersectPlane(planeRef.current, intersect);
+    return intersect;
+  };
+
+  // compute page bounds in world coordinates on the avatar's Y plane
+  // Use the full window viewport so the avatar can be placed anywhere on the page
+  const updateBounds = () => {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const corners = [
+      { x: 0, y: 0 },
+      { x: w, y: 0 },
+      { x: 0, y: h },
+      { x: w, y: h },
+    ];
+    const xs: number[] = [];
+    const zs: number[] = [];
+    corners.forEach((c) => {
+      const p = getPointFromClient(c.x, c.y);
+      if (p) {
+        xs.push(p.x);
+        zs.push(p.z);
+      }
+    });
+    if (xs.length && zs.length) {
+      boundsRef.current.minX = Math.min(...xs);
+      boundsRef.current.maxX = Math.max(...xs);
+      boundsRef.current.minZ = Math.min(...zs);
+      boundsRef.current.maxZ = Math.max(...zs);
+    }
+  };
+
+  useEffect(() => {
+    // update bounds on mount and when window size or camera changes
+    updateBounds();
+    const onResize = () => updateBounds();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [camera]);
+
+  const clampToBounds = (x: number, z: number) => {
+    const b = boundsRef.current;
+    return [Math.min(Math.max(x, b.minX), b.maxX), Math.min(Math.max(z, b.minZ), b.maxZ)];
+  };
+
+  const onWindowPointerMove = (ev: PointerEvent) => {
+    if (!draggingRef.current) return;
+    const pt = getPointFromClient(ev.clientX, ev.clientY);
+    if (!pt || !groupRef.current) return;
+    let nx = pt.x + dragOffsetRef.current.x;
+    let nz = pt.z + dragOffsetRef.current.z;
+    [nx, nz] = clampToBounds(nx, nz);
+    groupRef.current.position.x = nx;
+    groupRef.current.position.z = nz;
+    onPositionChange?.([
+      groupRef.current.position.x,
+      groupRef.current.position.y,
+      groupRef.current.position.z,
+    ]);
+  };
+
+  const onWindowPointerUp = (ev: PointerEvent) => {
+    if (!draggingRef.current) return;
+    draggingRef.current = false;
+    gl.domElement.style.cursor = 'auto';
+    window.removeEventListener('pointermove', onWindowPointerMove);
+    window.removeEventListener('pointerup', onWindowPointerUp);
+  };
+
+  // cleanup on unmount in case listeners remain
+  useEffect(() => {
+    return () => {
+      window.removeEventListener('pointermove', onWindowPointerMove);
+      window.removeEventListener('pointerup', onWindowPointerUp);
+    };
+  }, []);
 
   const colors = MOOD_COLORS[mood];
 
@@ -121,9 +297,10 @@ export function KidCompanion3D({ mood, onClick }: KidCompanion3DProps) {
       const eyeMoveX = mouseX * 0.04;
       const eyeMoveY = mouseY * 0.03;
 
-      leftEyeRef.current.position.x = -0.16 + eyeMoveX;
+      // Réduire l'écart horizontal de base entre les yeux
+      leftEyeRef.current.position.x = -0.07 + eyeMoveX;
       leftEyeRef.current.position.y = 0.05 + eyeMoveY;
-      rightEyeRef.current.position.x = 0.16 + eyeMoveX;
+      rightEyeRef.current.position.x = 0.07 + eyeMoveX;
       rightEyeRef.current.position.y = 0.05 + eyeMoveY;
     }
 
@@ -166,8 +343,15 @@ export function KidCompanion3D({ mood, onClick }: KidCompanion3DProps) {
       ref={groupRef}
       onClick={(e) => {
         e.stopPropagation();
+        if (draggingRef.current) return;
         onClick?.();
       }}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
+      onPointerOver={handlePointerOver}
+      onPointerOut={handlePointerOut}
     >
       {/* الجسم — بيضاوي صغير وناعم بدون أطراف حادة */}
       <mesh position={[0, 0.05, 0]} castShadow receiveShadow scale={[1, 0.85, 1]}>
@@ -193,7 +377,7 @@ export function KidCompanion3D({ mood, onClick }: KidCompanion3DProps) {
         </mesh>
 
         {/* العين اليسرى — كبيرة مع بريق أبيض لجعلها حيّة وودودة */}
-        <group position={[-0.16, 0.05, 0.35]}>
+        <group position={[-0.07, 0.05, 0.35]}>
           <mesh ref={leftEyeRef}>
             <sphereGeometry args={[0.11, 24, 24]} />
             <meshStandardMaterial color="#2b2b3d" />
@@ -205,7 +389,7 @@ export function KidCompanion3D({ mood, onClick }: KidCompanion3DProps) {
         </group>
 
         {/* العين اليمنى */}
-        <group position={[0.16, 0.05, 0.35]}>
+        <group position={[0.07, 0.05, 0.35]}>
           <mesh ref={rightEyeRef}>
             <sphereGeometry args={[0.11, 24, 24]} />
             <meshStandardMaterial color="#2b2b3d" />

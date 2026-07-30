@@ -101,6 +101,56 @@ export default function KidMishbakAssistant({ userName }: { userName?: string })
     return () => clearTimeout(timer);
   }, []);
 
+  const defaultScreenPos = { x: 16, y: 0 };
+  const [screenPos, setScreenPos] = useState(defaultScreenPos);
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const draggingRef = useRef(false);
+  const dragOffset = useRef({ x: 0, y: 0 });
+
+  const recenterAssistant = () => {
+    const h = panelRef.current?.offsetHeight ?? 224;
+    setScreenPos({ x: 16, y: window.innerHeight - h - 16 });
+  };
+
+  // position initiale en bas à gauche
+  useEffect(() => {
+    const setInitial = () => {
+      const h = panelRef.current?.offsetHeight ?? 224;
+      setScreenPos({ x: 16, y: window.innerHeight - h - 16 });
+    };
+    setInitial();
+    window.addEventListener('resize', setInitial);
+    return () => window.removeEventListener('resize', setInitial);
+  }, []);
+
+  const onPanelPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    draggingRef.current = true;
+    const rect = panelRef.current?.getBoundingClientRect();
+    dragOffset.current = {
+      x: e.clientX - (rect?.left ?? 0),
+      y: e.clientY - (rect?.top ?? 0),
+    };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+
+  const onPanelPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    draggingRef.current = false;
+    try { e.currentTarget.releasePointerCapture(e.pointerId); } catch {}
+  };
+
+  const onPanelPointerMove = (ev: React.PointerEvent<HTMLDivElement>) => {
+    if (!draggingRef.current) return;
+    const w = panelRef.current?.offsetWidth ?? 176;
+    const h = panelRef.current?.offsetHeight ?? 224;
+    const minX = -(w - 32);
+    let nx = ev.clientX - dragOffset.current.x;
+    let ny = ev.clientY - dragOffset.current.y;
+    nx = Math.max(minX, Math.min(nx, window.innerWidth - w));
+    ny = Math.max(0, Math.min(ny, window.innerHeight - h));
+    setScreenPos({ x: nx, y: ny });
+  };
+
   const handleCompanionClick = () => {
     playChime('tap');
     const randomTips = [
@@ -130,6 +180,13 @@ export default function KidMishbakAssistant({ userName }: { userName?: string })
     };
   }, []);
 
+  // cleanup on unmount
+  useEffect(() => {
+    return () => {
+      draggingRef.current = false;
+    };
+  }, []);
+
   if (!isVisible) {
     return (
       <button
@@ -143,37 +200,50 @@ export default function KidMishbakAssistant({ userName }: { userName?: string })
   }
 
   return (
-    <div className="fixed bottom-0 left-2 z-40 flex flex-col items-start gap-3 w-44">
-      <div key={bubbleKey} className="kid-speech-bubble">
-        <p className="kid-speech-text">{message}</p>
-        <button
-          onClick={() => setIsVisible(false)}
-          className="kid-close-btn"
-          aria-label="إخفاء المساعد"
-        >
-          ×
-        </button>
-      </div>
-
-      <div
-        className="w-44 h-56 rounded-t-2xl relative overflow-hidden cursor-pointer z-20"
-        onClick={handleCompanionClick}
-        title="انقر للحصول على نصيحة!"
+    // full-screen overlay so assistant is always in front
+    <div className="fixed inset-0 z-[2147483647] pointer-events-none">
+      <button
+        type="button"
+        onClick={recenterAssistant}
+        className="kid-recenter-btn"
+        aria-label="Recentrer le compagnon"
       >
-        <div className="absolute inset-0 bg-gradient-to-t from-blue-200/50 via-purple-100/30 to-transparent rounded-t-2xl" />
-        {!isLoaded && (
-          <div className="absolute inset-0 flex items-center justify-center z-10">
-            <div className="flex flex-col items-center gap-2">
-              <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-              <span className="text-blue-600 text-xs font-medium">جاري التحميل...</span>
-            </div>
-          </div>
-        )}
+        ↺
+      </button>
+      <div
+        ref={panelRef}
+        style={{ left: screenPos.x, top: screenPos.y }}
+        className="absolute w-44 h-56 rounded-t-2xl overflow-hidden cursor-pointer pointer-events-auto"
+        // improve transform performance and touch behaviour
+        aria-hidden={false}
+        tabIndex={-1}
+        role="dialog"
+        onPointerDown={onPanelPointerDown}
+        onPointerMove={onPanelPointerMove}
+        onPointerUp={onPanelPointerUp}
+        onClick={handleCompanionClick}
+        title="اسحب أو انقر للحصول على نصيحة!"
+      >
+        <div key={bubbleKey} className="kid-speech-bubble">
+          <p className="kid-speech-text">{message}</p>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsVisible(false);
+            }}
+            className="kid-close-btn"
+            aria-label="إخفاء المساعد"
+          >
+            ×
+          </button>
+        </div>
+        
         <Canvas
           camera={{ position: [0, 0.6, 2.6], fov: 42 }}
           style={{
             opacity: isLoaded ? 1 : 0,
             transition: 'opacity 0.8s ease-in-out',
+            background: 'rgba(255,255,255,0.02)',
           }}
           gl={{ alpha: true, antialias: true }}
         >

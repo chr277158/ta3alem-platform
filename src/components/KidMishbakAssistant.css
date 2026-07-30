@@ -66,6 +66,31 @@
   transform: scale(1.12) rotate(-6deg);
 }
 
+.kid-recenter-btn {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 50;
+  width: 42px;
+  height: 42px;
+  border-radius: 9999px;
+  border: none;
+  background: rgba(59, 130, 246, 0.96);
+  color: #ffffff;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.25);
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.kid-recenter-btn:hover {
+  transform: scale(1.08);
+  background: rgba(37, 99, 235, 0.96);
+}
+
 /* دخول الفقاعة بارتداد لطيف بدل ظهور مسطح — أكثر مرحاً للأطفال */
 @keyframes kidBubbleIn {
   0% {
