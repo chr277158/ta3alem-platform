@@ -1,137 +1,166 @@
-/* ===== فقاعة الكلام المخصصة للأطفال ===== */
-/* أكبر، أكثر استدارة، وبألوان مبهجة تسهّل القراءة والتفاعل */
-.kid-speech-bubble {
+/* === المجموعة الرئيسية === */
+.kid-companion-panel {
+  position: fixed;
+  width: 220px;
+  height: 400px;
+  z-index: 1000;
+  touch-action: none;
+}
+
+.kid-companion-avatar {
   position: relative;
-  max-width: 190px;
-  padding: 14px 18px;
-  border-radius: 26px 26px 26px 6px;
-  background: #ffffff;
-  border: 3px solid #fcd34d;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12), 0 0 0 4px rgba(252, 211, 77, 0.15);
-  animation: kidBubbleIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-  z-index: 10;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  border-radius: 12px;
+  padding-bottom: 0;
+}
+
+.kid-companion-avatar.loaded canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+/* === الأنيميشن والفقاعة === */
+@keyframes kidBubbleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.85) translateY(14px);
+  }
+  70% {
+    transform: scale(1.03) translateY(-2px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.kid-speech-bubble {
+  position: absolute;
+  top: -155px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border: 3px solid #fbbf24;
+  border-radius: 26px;
+  padding: 12px 16px;
+  max-width: 200px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1001;
+  animation: kidBubbleIn 0.3s ease-out;
+  white-space: normal;
+  word-wrap: break-word;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
 }
 
 .kid-speech-text {
-  font-size: 16px;
-  line-height: 1.6;
-  font-weight: 700;
-  color: #3b3552;
-  letter-spacing: 0.2px;
   margin: 0;
+  font-size: 14px;
+  color: #2b2b3d;
+  font-weight: 500;
+  line-height: 1.4;
 }
 
 .kid-close-btn {
   position: absolute;
-  top: -10px;
-  left: -10px;
-  width: 26px;
-  height: 26px;
-  border-radius: 9999px;
-  background: #ff8fa3;
-  color: #ffffff;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  background: #ffb3ba;
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 15px;
-  font-weight: 700;
-  border: 2px solid #ffffff;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-  transition: transform 0.15s ease;
+  transition: transform 0.2s ease;
 }
 
 .kid-close-btn:hover {
-  transform: scale(1.15);
-}
-
-.kid-close-btn:active {
-  transform: scale(0.9);
-}
-
-/* زر إعادة إظهار المساعد بعد إخفائه */
-.kid-reopen-btn {
-  position: fixed;
-  bottom: 16px;
-  left: 16px;
-  z-index: 50;
-  background: linear-gradient(135deg, #ffd873, #ff9ec7);
-  color: #ffffff;
-  padding: 14px;
-  border-radius: 9999px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
-  transition: transform 0.25s ease;
-}
-
-.kid-reopen-btn:hover {
-  transform: scale(1.12) rotate(-6deg);
-}
-
-.kid-recenter-btn {
-  position: fixed;
-  bottom: 16px;
-  right: 16px;
-  z-index: 50;
-  width: 42px;
-  height: 42px;
-  border-radius: 9999px;
-  border: none;
-  background: rgba(59, 130, 246, 0.96);
-  color: #ffffff;
-  font-size: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.25);
-  cursor: pointer;
-  transition: transform 0.2s ease, background 0.2s ease;
-}
-
-.kid-recenter-btn:hover {
-  transform: scale(1.08);
-  background: rgba(37, 99, 235, 0.96);
-}
-
-/* دخول الفقاعة بارتداد لطيف بدل ظهور مسطح — أكثر مرحاً للأطفال */
-@keyframes kidBubbleIn {
-  0% {
-    opacity: 0;
-    transform: translateY(14px) scale(0.85);
-  }
-  70% {
-    opacity: 1;
-    transform: translateY(-3px) scale(1.03);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  transform: scale(1.1);
 }
 
 @keyframes kidBounce {
-  0% {
-    transform: translateY(0) scale(1);
-  }
-  40% {
-    transform: translateY(-6px) scale(1.03);
-  }
-  70% {
-    transform: translateY(2px) scale(0.98);
-  }
-  100% {
-    transform: translateY(0) scale(1);
-  }
+  0%   { transform: translateY(0) scale(1); }
+  40%  { transform: translateY(-6px) scale(1.03); }
+  70%  { transform: translateY(2px) scale(0.98); }
+  100% { transform: translateY(0) scale(1); }
 }
 
 .kid-bounce {
   animation: kidBounce 0.36s ease-out;
 }
 
-/* احترام تفضيل تقليل الحركة لدى بعض المستخدمين */
+/* 🔘 زر القراءة الصوتية */
+.kid-tts-btn {
+  margin-top: 8px;
+  padding: 4px 10px;
+  background: #f0f9ff;
+  border: 1px solid #0ea5e9;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.kid-tts-btn:hover {
+  background: #0ea5e9;
+  transform: scale(1.1);
+}
+
+.kid-tts-btn:focus-visible {
+  outline: 3px solid #fbbf24;
+  outline-offset: 2px;
+}
+
+/* ♿ احترام تفضيل تقليل الحركة - الآن يشمل كل الأنيميشن! */
 @media (prefers-reduced-motion: reduce) {
   .kid-speech-bubble {
-    animation: none;
+    animation: none !important;
+    transition: none !important;
   }
-  .kid-reopen-btn:hover {
-    transform: none;
+
+  .kid-bounce {
+    animation: none !important; /* ✅ هذا ما كان مفقوداً */
+  }
+
+  .kid-companion-avatar {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* 🎨 وضع التباين العالي - يُفعّل عبر class على الـ body */
+  :root.high-contrast .kid-speech-bubble {
+    background: #000 !important;
+    color: #fff !important;
+    border: 3px solid #fbbf24 !important;
+    font-weight: 700;
+  }
+
+  /* 📖 وضع dyslexie-friendly */
+  :root.dyslexie-mode .kid-speech-text {
+    font-family: 'OpenDyslexic', 'Comic Sans MS', sans-serif !important;
+    line-height: 1.8 !important;
+    letter-spacing: 0.05em !important;
+    font-size: 1.1em !important;
+  }
+}
+
+/* دعم الحركة أيضاً للمستخدمين الذين يفضلون الحركة المُخفّضة */
+@media (prefers-reduced-motion: reduce) {
+  .kid-tts-btn {
+    transition: none !important;
   }
 }

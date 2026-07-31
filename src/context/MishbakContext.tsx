@@ -9,7 +9,7 @@ interface MishbakContextType {
   showMessage: (message: string, mood?: MishbakMood, duration?: number) => void;
 }
 
-const MishbakContext = createContext<MishbakContextType | undefined>(undefined);
+export const MishbakContext = createContext<MishbakContextType | undefined>(undefined);
 
 export function MishbakProvider({ children }: { children: ReactNode }) {
   const [currentMood, setCurrentMood] = useState<MishbakMood>('neutral');
