@@ -49,7 +49,9 @@ export default function GamePage() {
         const data = await res.json();
         if (data.success) {
           setUser(data.user);
-          await fetchQuestions();
+          await fetchQuestions(data.user?.playerLevel || 1);
+        } else {
+          setLoading(false);
         }
       } catch (error) {
         console.error('خطأ في التحقق:', error);
@@ -60,18 +62,21 @@ export default function GamePage() {
     checkAuth();
   }, [router]);
 
-  const fetchQuestions = async () => {
+  const fetchQuestions = async (level: number = 1) => {
     try {
-      const res = await fetch(`/api/game/questions?subject=${subject}`, {
+      const res = await fetch(`/api/game/questions?subject=${subject}&level=${level}`, {
         credentials: 'include',
       });
       const data = await res.json();
-      if (data.success) {
-        setQuestions(data.questions);
+      if (data.success && Array.isArray(data.questions)) {
+        setQuestions(data.questions || []);
+      } else {
+        setQuestions([]);
       }
       setLoading(false);
     } catch (error) {
       console.error('خطأ في جلب الأسئلة:', error);
+      setQuestions([]);
       setLoading(false);
     }
   };
@@ -119,7 +124,9 @@ export default function GamePage() {
         credentials: 'include',
         body: JSON.stringify({
           subject,
+          level: user?.playerLevel || 1,
           score: scoreRef.current,
+          totalQuestions: questions.length,
           heartsLost: 3 - heartsRef.current,
         }),
       });
