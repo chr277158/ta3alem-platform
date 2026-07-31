@@ -159,16 +159,15 @@ export function KidCompanion3D({
     return intersect;
   };
 
-  // compute page bounds in world coordinates on the avatar's Y plane
-  // Use the full window viewport so the avatar can be placed anywhere on the page
+  // compute bounds in world coordinates on the avatar's Y plane
+  // Limit movement to the visible canvas frame only
   const updateBounds = () => {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
+    const rect = gl.domElement.getBoundingClientRect();
     const corners = [
-      { x: 0, y: 0 },
-      { x: w, y: 0 },
-      { x: 0, y: h },
-      { x: w, y: h },
+      { x: rect.left, y: rect.top },
+      { x: rect.right, y: rect.top },
+      { x: rect.left, y: rect.bottom },
+      { x: rect.right, y: rect.bottom },
     ];
     const xs: number[] = [];
     const zs: number[] = [];

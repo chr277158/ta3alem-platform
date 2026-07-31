@@ -61,7 +61,10 @@ export default function KidMishbakAssistant({ userName }: { userName?: string })
   const [mood, setMood] = useState<MishbakMood>('neutral' as MishbakMood);
   const [isLoaded, setIsLoaded] = useState(false);
   const [bubbleKey, setBubbleKey] = useState(0); // لإعادة تشغيل أنيميشن الفقاعة عند تغيّر الرسالة
-  const tipTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [showBubble, setShowBubble] = useState(false);
+  const [isBouncing, setIsBouncing] = useState(false);
+  const tipTimeoutRef = useRef<number | null>(null);
+  const bubbleTimeoutRef = useRef<number | null>(null);
 
   const contextualMessages: Record<string, { text: string; mood: MishbakMood }> = {
     '/dashboard': {
@@ -86,6 +89,10 @@ export default function KidMishbakAssistant({ userName }: { userName?: string })
       text: 'وقت المرح! استمتع باللعب الذي فتحته بجدارتك 🎮',
       mood: 'excited',
     },
+    '/game': {
+      text: 'اختر الإجابة بتركيز، وقل لي إذا أردتُ مساعدتك في الشرح 💡',
+      mood: 'thinking',
+    },
   };
 
   useEffect(() => {
@@ -94,7 +101,25 @@ export default function KidMishbakAssistant({ userName }: { userName?: string })
     setMessage(context.text);
     setMood(context.mood);
     setBubbleKey((k) => k + 1);
+    setShowBubble(false);
   }, [pathname, userName]);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    const autoHint = window.setTimeout(() => {
+      const baseRoute = '/' + pathname.split('/')[1];
+      const context = contextualMessages[baseRoute] || contextualMessages['/dashboard'];
+      if (!showBubble) {
+        setMessage(context.text);
+        setMood(context.mood);
+        setBubbleKey((k) => k + 1);
+        setShowBubble(true);
+      }
+    }, 6000);
+
+    return () => window.clearTimeout(autoHint);
+  }, [pathname, isLoaded, showBubble]);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoaded(true), 1000);
@@ -136,6 +161,8 @@ export default function KidMishbakAssistant({ userName }: { userName?: string })
 
   const onPanelPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
     draggingRef.current = false;
+    setIsBouncing(true);
+    window.setTimeout(() => setIsBouncing(false), 360);
     try { e.currentTarget.releasePointerCapture(e.pointerId); } catch {}
   };
 
@@ -149,34 +176,60 @@ export default function KidMishbakAssistant({ userName }: { userName?: string })
     nx = Math.max(minX, Math.min(nx, window.innerWidth - w));
     ny = Math.max(0, Math.min(ny, window.innerHeight - h));
     setScreenPos({ x: nx, y: ny });
-  };
-
-  const handleCompanionClick = () => {
-    playChime('tap');
-    const randomTips = [
-      'هل تعلم؟ المراجعة اليومية تقوي الذاكرة! ',
-      'نصيحة: اقرأ السؤال جيداً قبل اختيار الإجابة 👀',
-      'أنت تبلي بلاءً حسناً، استمر! ',
-      'لا بأس من الخطأ، فهو جزء من التعلم! 🌱',
-    ];
-    const tip = randomTips[Math.floor(Math.random() * randomTips.length)];
-    setMessage(tip);
-    setMood('thinking' as MishbakMood);
-    setBubbleKey((k) => k + 1);
-    if (tipTimeoutRef.current) clearTimeout(tipTimeoutRef.current);
-    tipTimeoutRef.current = setTimeout(() => {
-      playChime('tip');
+    if (!showBubble) {
       const baseRoute = '/' + pathname.split('/')[1];
       const context = contextualMessages[baseRoute] || contextualMessages['/dashboard'];
       setMessage(context.text);
       setMood(context.mood);
       setBubbleKey((k) => k + 1);
+      setShowBubble(true);
+    }
+  };
+
+  const showTemporaryBubble = (tipText?: string, keepContext = true) => {
+    if (bubbleTimeoutRef.current) window.clearTimeout(bubbleTimeoutRef.current);
+    setShowBubble(true);
+    if (tipText) {
+      setMessage(tipText);
+      setMood('thinking' as MishbakMood);
+    } else {
+      const baseRoute = '/' + pathname.split('/')[1];
+      const context = contextualMessages[baseRoute] || contextualMessages['/dashboard'];
+      setMessage(context.text);
+      setMood(context.mood);
+    }
+    setBubbleKey((k) => k + 1);
+
+    if (keepContext) {
+      bubbleTimeoutRef.current = window.setTimeout(() => {
+        setShowBubble(false);
+      }, 2600);
+    }
+  };
+
+  const handleCompanionClick = () => {
+    playChime('tap');
+    const baseRoute = '/' + pathname.split('/')[1];
+    const randomTips = [
+      'هل تعلم؟ المراجعة اليومية تقوي الذاكرة! ',
+      'نصيحة: اقرأ السؤال جيداً قبل اختيار الإجابة 👀',
+      'أنت تبلي بلاءً حسناً، استمر! ',
+      'لا بأس من الخطأ، فهو جزء من التعلم! 🌱',
+      baseRoute === '/game' ? 'أستطيع أن أشرح لك السؤال خطوة بخطوة إذا أردتَ 💡' : 'أحتاجك لتستمر، وأنت قادر على ذلك ✨',
+    ];
+    const tip = randomTips[Math.floor(Math.random() * randomTips.length)];
+    showTemporaryBubble(tip, true);
+    if (tipTimeoutRef.current) window.clearTimeout(tipTimeoutRef.current);
+    tipTimeoutRef.current = window.setTimeout(() => {
+      playChime('tip');
+      showTemporaryBubble(undefined, false);
     }, 4000);
   };
 
   useEffect(() => {
     return () => {
-      if (tipTimeoutRef.current) clearTimeout(tipTimeoutRef.current);
+      if (tipTimeoutRef.current) window.clearTimeout(tipTimeoutRef.current);
+      if (bubbleTimeoutRef.current) window.clearTimeout(bubbleTimeoutRef.current);
     };
   }, []);
 
@@ -224,19 +277,21 @@ export default function KidMishbakAssistant({ userName }: { userName?: string })
         onClick={handleCompanionClick}
         title="اسحب أو انقر للحصول على نصيحة!"
       >
-        <div key={bubbleKey} className="kid-speech-bubble">
-          <p className="kid-speech-text">{message}</p>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsVisible(false);
-            }}
-            className="kid-close-btn"
-            aria-label="إخفاء المساعد"
-          >
-            ×
-          </button>
-        </div>
+        {showBubble && (
+          <div key={bubbleKey} className={`kid-speech-bubble ${isBouncing ? 'kid-bounce' : ''}`}>
+            <p className="kid-speech-text">{message}</p>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsVisible(false);
+              }}
+              className="kid-close-btn"
+              aria-label="إخفاء المساعد"
+            >
+              ×
+            </button>
+          </div>
+        )}
         
         <Canvas
           camera={{ position: [0, 0.6, 2.6], fov: 42 }}

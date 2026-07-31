@@ -107,6 +107,25 @@
   }
 }
 
+@keyframes kidBounce {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  40% {
+    transform: translateY(-6px) scale(1.03);
+  }
+  70% {
+    transform: translateY(2px) scale(0.98);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+.kid-bounce {
+  animation: kidBounce 0.36s ease-out;
+}
+
 /* احترام تفضيل تقليل الحركة لدى بعض المستخدمين */
 @media (prefers-reduced-motion: reduce) {
   .kid-speech-bubble {
